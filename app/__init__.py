@@ -170,6 +170,10 @@ def register():
             new_user = UserModel(username, generate_password_hash(password))
             db.session.add(new_user)
             db.session.commit()
+            # table = ("INSERT INTO lists( question) VALUES(%s,%s)", (1003, str(request_data['question'])))
+            # db.execute_query(table)
+            # app.logger.info("adding questions")
+            print(new_user.id)
             # Return login page upon successful registration
             return render_template("login.html")
         else:
