@@ -21,8 +21,6 @@ app = Flask(__name__)
 lat, long = api_location()
 ENDPOINT_YELP, HEADERS_YELP = apiYelp()
 
-# app.config[ "SQLALCHEMY_DATABASE_URI" ] = "postgresql://postgres:pass@localhost:5432/streeteatsdb"
-# app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 app.config[
     "SQLALCHEMY_DATABASE_URI"
