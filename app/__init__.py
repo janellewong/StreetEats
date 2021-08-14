@@ -3,7 +3,6 @@ from flask import Flask, render_template, request, g
 from dotenv import load_dotenv
 import requests
 from flask import request
-from . import api
 from app.api import api_location
 from app.api import apiYelp
 from app.api import yelpReviews
@@ -32,6 +31,39 @@ app.config['SQLALCHEMY_DATABASE_URI']= 'postgresql+psycopg2://{user}:{passwd}@{h
 	table=os.getenv('POSTGRES_DB'))
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+## todo return business ids from a list
+
+## todo return list names for a user
+def getListNames(userId):
+    from .db import Lists, db
+    # get list names from user_id_fk
+    listIds = db.session.query(Lists).filter_by(user_id_fk=1).all()
+    for listId in listIds:  
+        print(listId.list_name, flush=True)
+
+## todo return friends
+def getFriends(userId):
+    from .db import friends, db
+    # get names from friends table from user_id_fk
+    userIds = db.session.query(friends).filter_by(user_id_fk=1).all()
+    for userId in userIds:  
+        print(userId.friend_id, flush=True)
+
+# creates a default liked list for every registered user
+def createLikedList(userId):
+    from .db import Lists, db
+    add_liked_list = Lists(list_name="Liked", user_id_fk=userId)
+    db.session.add(add_liked_list)
+    print(userId, flush=True)
+    db.session.commit()
+
+def createList(userId, listName):
+    from .db import Lists, db
+    add_list = Lists(list_name=listName, user_id_fk=userId)
+    db.session.add(add_list)
+    print(userId, listName, flush=True)
+    db.session.commit()
 
 class user_category:
     def __init__(self, type, location):
@@ -100,12 +132,41 @@ def index():
     # if not logged in, do this
     # return render_template("userhomepage.html", title="StreetEats", url=os.getenv("URL"), data=business_data,)
 
-
+# add business names and ids to db
 @app.route("/like-business", methods=["POST"])
 def likeBusiness():
-    business_id = request.form.get("business-id")
+    from .db import BusinessList, listscontents, db
+    business_data = request.form.get("business-id").split(", ")
+    business_id = business_data[0].replace("'", '').replace(')', '').replace('(', '')
+    business_name = business_data[1].replace("'", '').replace(')', '').replace('(', '')
+    # print(business_id, flush=True)
+    # print(business_name, flush=True)
+    
+    # insert into business table
+    add_business = BusinessList(business_id=business_id, business_name=business_name)
+    db.session.add(add_business)
+    db.session.commit()
 
-    # Save to db or something
+    # insert into listscontents table
+    statement = listscontents.insert().values(list_id_fk=1, business_id_fk=business_id)
+    db.session.execute(statement)
+    db.session.commit()
+
+    # Read from listscontents table
+    ids = db.session.query(listscontents).filter_by(list_id_fk=1).all()
+    for id in ids:  
+        print(id.business_id_fk)
+    #### returns business ids from a list == 1 #####
+    # 4qyjRhjEgWGHPjgYWkBy8g
+    # rCevbj5Zovz1sNqaEMlSNA
+    # 1TCm5Z71hpPaAl0PXr6S6g
+    # glhCxpZ4OdUkXPp0jIqvPg
+    # pzg5nXrMocCzQIoTf57QJw
+
+    # ids = db.session.query(listscontents).filter_by(list_id_fk=1).all()
+    # print(ids)
+    #### returns an array of (list_id_fk, 'business_id_fk'), will need to extract ### 
+    # [(1, '4qyjRhjEgWGHPjgYWkBy8g'), (1, 'rCevbj5Zovz1sNqaEMlSNA'), (1, '1TCm5Z71hpPaAl0PXr6S6g')]
 
     return '{"id":"%s","success":true}' % business_id
 
@@ -170,10 +231,7 @@ def register():
             new_user = UserModel(username, generate_password_hash(password))
             db.session.add(new_user)
             db.session.commit()
-            # table = ("INSERT INTO lists( question) VALUES(%s,%s)", (1003, str(request_data['question'])))
-            # db.execute_query(table)
-            # app.logger.info("adding questions")
-            print(new_user.id)
+            createLikedList(new_user.user_id)
             # Return login page upon successful registration
             return render_template("login.html")
         else:
