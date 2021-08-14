@@ -123,19 +123,22 @@
                         <div class="card-body">
 
                             <form action="{{ url_for('restaurant' ,name=entry['name']) }}" method="POST" class="id">
-                                <button class="look-like-link" type=submit>{{entry['name']}}</button> 
+                                <button class="look-like-link" type=submit>{{entry['name']}}</button>
                                 <input type="hidden" name="id" value="{{entry['id']}}" />
                             </form>
 
                             <p class="card-text"><strong>Rating: </strong>{{entry['rating']}}
                                 <br> <strong>Price: </strong>{{entry['price']}}
                                 <br> <strong>Phone: </strong>{{entry['display_phone']}}
-                                <br> <strong>Address: </strong>{{entry['location']['address1']}}, {{entry['location']['city']}}, {{entry['location']['state']}} {{entry['location']['zip_code']}}, {{entry['location']['country']}}
+                                <br> <strong>Address: </strong>{{entry['location']['address1']}},
+                                {{entry['location']['city']}}, {{entry['location']['state']}}
+                                {{entry['location']['zip_code']}}, {{entry['location']['country']}}
                             <form action='/' method="POST" class="like-form">
                                 <div style="text-align:right">
                                     Like Count: <span class="like-count">1</span>
-                                    <input type="hidden" name="business-id" value="{{entry['id']}}" />
-                                    <button class="btn btn-primary" type="submit" name="like" id="like" value="like">Add to list</button>
+                                    <input type="hidden" name="business-id" value="{{entry['id'], entry['name']}}" />
+                                    <button class="btn btn-primary" type="submit" name="like" id="like" value="like">Add
+                                        to list</button>
                                 </div>
                             </form>
 
