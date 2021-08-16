@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="content">
-<div class="row">
+  <div class="row">
     <div class="col-sm-8">
       <div class="card">
         <div class="card-body">
@@ -10,42 +10,32 @@
           <br>
           <br>
           <div class="row row-cols-1 row-cols-md-2 g-4">
+            {% for name in names%}
             <div class="col">
               <div class="card">
                 <img src="..." class="card-img-top" alt="...">
                 <div class="card-body">
-                  <h5 class="card-title">List Title</h5>
-                  <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+
+                  <form action="{{ url_for('listpage' ,listName=name) }}" method="POST" class="list">
+                    <button class="card-title" type=submit>
+                      <h5 class="card-title">{{name}}</h5>
+                    </button>
+                    <input type="hidden" name="list" value="{{name}}" />
+                  </form>
+
+                  <p class="card-text">This is a longer card with supporting text below as a natural lead-in to
+                    additional content. This content is a little bit longer.</p>
                 </div>
               </div>
             </div>
-            <div class="col">
-              <div class="card">
-                <img src="..." class="card-img-top" alt="...">
-                <div class="card-body">
-                  <h5 class="card-title">List Title</h5>
-                  <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                </div>
-              </div>
-            </div>
-            <div class="col">
-              <div class="card">
-                <img src="..." class="card-img-top" alt="...">
-                <div class="card-body">
-                  <h5 class="card-title">List Title</h5>
-                  <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content.</p>
-                </div>
-              </div>
-            </div>
-            <div class="col">
-              <div class="card">
-                <img src="..." class="card-img-top" alt="...">
-                <div class="card-body">
-                  <h5 class="card-title">List Title</h5>
-                  <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                </div>
-              </div>
-            </div>
+            {% endfor %}
+            <!-- 
+             <form action="{{ url_for('listpage' ,listName=test) }}" method="POST" class="list">
+                    <button class="card-title" type=submit>List Name from database</button>
+                    <input type="hidden" name="list" value="test" /> -->
+
+
+
           </div>
           <br><br><br><br><br><br><br>
           <button class="btn btn-primary" style="float: right;">Create a new list</button>
@@ -54,26 +44,26 @@
     </div>
 
     <div class="col-sm-4">
-    <div class="extend">
-      <div class="card">
-        <div class="card-body">
-          <h3 class="card-title">Find your Friends!!!</h3>
-          <p class="card-text">Add your friends to see their restaurant lists!</p>
-          <form action="/" method="POST">
-            <div class="form-floating mb-3">
-                <input id ="type" name ="type" type="text" class="form-control" id="floatingInput" placeholder="Category">
+      <div class="extend">
+        <div class="card">
+          <div class="card-body">
+            <h3 class="card-title">Find your Friends!!!</h3>
+            <p class="card-text">Add your friends to see their restaurant lists!</p>
+            <form action="/" method="POST">
+              <div class="form-floating mb-3">
+                <input id="type" name="type" type="text" class="form-control" id="floatingInput" placeholder="Category">
                 <label for="floatingInput">Username</label>
-            </div>
-            <button class="btn btn-primary" type="submit" id="submit" name="submit" value="search">Search</button>
-            
-            <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-          </form>
+              </div>
+              <button class="btn btn-primary" type="submit" id="submit" name="submit" value="search">Search</button>
+
+              <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+            </form>
+          </div>
         </div>
       </div>
     </div>
-    </div>
 
-</div>
+  </div>
 </div>
 
 

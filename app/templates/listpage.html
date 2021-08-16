@@ -3,29 +3,34 @@
 {% block content %}
 
 <div class="listpage">
-    <h1>List Name </h1>
-    <br>
+  <h1>List Name </h1>
+  <br>
 
-   
-    <div class="card mb-3" style="max-width: 1050px;" style="max-height: 50%;">
-        <div class="row g-0">
-          <div class="col-md-4">
-            <img src="..." class="img-fluid rounded-start" alt="...">
-          </div>
-          <div class="col-md-8">
-            <div class="card-body">
-              <h5 class="card-title">Name</h5>
-              <p class="card-text">
-                
-                
-              <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-            </div>
-            <div class="card-footer">
-                <small class="text-muted">poooop</small>
-            </div>
-          </div>
+  {% for entry in data['liked_businesses'] %}
+
+  <div class="card mb-3" style="max-width: 1050px;" style="max-height: 50%;">
+    <div class="row g-0">
+      <div class="col-md-4">
+        <img src="..." class="img-fluid rounded-start" alt="...">
+      </div>
+      <div class="col-md-8">
+        <div class="card-body">
+          <h5 class="card-title">{{entry['name']}}</h5>
+          <p class="card-text">
+          <p><strong>Price: </strong> {{entry['price']}}</p>
+          <p><strong>Rating: </strong> {{entry['rating']}}</p>
+          <p><strong>Phone: </strong>{{entry['display_phone']}}</p>
+
+          <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
         </div>
+        <div class="card-footer">
+          <small class="text-muted">poooop</small>
+        </div>
+      </div>
     </div>
+  </div>
+
+  {% endfor %}
 
 
 

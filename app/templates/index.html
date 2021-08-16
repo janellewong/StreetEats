@@ -6,7 +6,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta property="og:title" content="StreetEats>
+    <meta property="og:title" content="StreetEats">
     <meta property=" og:description" content="StreetEats">
     <meta property="og:url" content="{{ url }}">
 
@@ -86,7 +86,7 @@
                         <label for="floatingInput">Location (City)</label>
                     </div>
 
-                    <a href="#search-results">
+                    <a href="#search">
                         <button class="btn btn-primary" type="submit" id="submit" name="submit"
                             value="search">Search</button>
                     </a>
@@ -98,16 +98,22 @@
 
         {% block content %}
 
+        <a href="#test">Contact</a>
+
         {% if section %}
         <script>
             $(function () {
-                $("html, body").animate({ scrollTop: $("#{{ search-results }}").offset().top }, 500);
+                $("html, body").animate({ scrollTop: $("#{{ test }}").offset().top }, 500);
             });
         </script>
         {% endif %}
 
+        <div id="test">
+            <p></p>
+        </div>
 
         <div class="searchresults" id="search-results">
+            <!--SEARCH_RESULTS_START-->
             <h1>Search results: </h1>
             <br>
 
@@ -123,19 +129,22 @@
                         <div class="card-body">
 
                             <form action="{{ url_for('restaurant' ,name=entry['name']) }}" method="POST" class="id">
-                                <button class="look-like-link" type=submit>{{entry['name']}}</button> 
+                                <button class="look-like-link" type=submit>{{entry['name']}}</button>
                                 <input type="hidden" name="id" value="{{entry['id']}}" />
                             </form>
 
                             <p class="card-text"><strong>Rating: </strong>{{entry['rating']}}
                                 <br> <strong>Price: </strong>{{entry['price']}}
                                 <br> <strong>Phone: </strong>{{entry['display_phone']}}
-                                <br> <strong>Address: </strong>{{entry['location']['address1']}}, {{entry['location']['city']}}, {{entry['location']['state']}} {{entry['location']['zip_code']}}, {{entry['location']['country']}}
+                                <br> <strong>Address: </strong>{{entry['location']['address1']}},
+                                {{entry['location']['city']}}, {{entry['location']['state']}}
+                                {{entry['location']['zip_code']}}, {{entry['location']['country']}}
                             <form action='/' method="POST" class="like-form">
                                 <div style="text-align:right">
                                     Like Count: <span class="like-count">1</span>
                                     <input type="hidden" name="business-id" value="{{entry['id']}}" />
-                                    <button class="btn btn-primary" type="submit" name="like" id="like" value="like">Add to list</button>
+                                    <button class="btn btn-primary" type="submit" name="like" id="like" value="like">Add
+                                        to list</button>
                                 </div>
                             </form>
 
@@ -151,6 +160,7 @@
 
 
             {% endfor %}
+            <!--SEARCH_RESULTS_END-->
 
             {% endblock %}
 
@@ -171,9 +181,11 @@
                 url:"/",
                 type:"POST",
                 cache:false,
-                data:$(".search-form").serialize(),
+                data:$(e.target).serialize(),
                 success: function (data) {
                     console.log(data);
+                    var cleanedData = data.split('<!--SEARCH_RESULTS_START-->')[1].split('<!--SEARCH_RESULTS_END-->')[0]
+                    $('#search-results').html(cleanedData);
                    
                 }
                 });
