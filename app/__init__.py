@@ -221,6 +221,14 @@ def userpage():
 @app.route("/list/<listName>", methods=["POST", "GET"])
 def listpage(listName):
     idList1 = ["aarBX0VyJbjMACGCcMrfEQ", "U8tIgXZ0T--8ZNEVoDap0g"]  # TESTING PURPOSES
+    # THIS WORKS NOW
+    SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+    json_url = os.path.join(SITE_ROOT, "restaurantLiked.json")
+    with open(json_url, "w") as file1:
+        stuff = {"liked_businesses": []}
+        json.dump(stuff, file1)
+    file1.close()
+
     for id in idList1:
         ENDPOINT_YELPB = yelpBusinessInfo(id)
         responseB = requests.get(url=ENDPOINT_YELPB, headers=HEADERS_YELP)
@@ -244,14 +252,7 @@ def listpage(listName):
             "address": address,
         }
 
-        SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
-        json_url = os.path.join(SITE_ROOT, "restaurantLiked.json")
-
         # idea: first clear the json file THEN follow through with code to append so there is no overlap in data
-        """ with open(json_url, "w") as file1:
-            stuff = {"liked_businesses": []}
-            json.dump(stuff, file1)
-        file1.close() """
 
         # this opens the json file and appends data to it to get it to display in html
         with open(json_url, "r+") as file:

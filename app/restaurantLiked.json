@@ -7,6 +7,14 @@
             "rating": 4.0,
             "phone": "+1 905-497-2211",
             "address": "7910 Hurontario Street"
+        },
+        {
+            "id": "U8tIgXZ0T--8ZNEVoDap0g",
+            "name": "Tandoori Tonite",
+            "price": "$",
+            "rating": 4.5,
+            "phone": "+1 905-495-4403",
+            "address": "15A Fisherman Dr"
         }
     ]
 }
