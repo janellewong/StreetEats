@@ -309,6 +309,13 @@ def userpage():
     )
 
 
+@app.route("/create-newList", methods=["POST"])
+def createNewList():
+    newList_name = request.form.get("newList")
+
+    return '{"id":"%s","success":true}' % newList_name
+
+
 @app.route("/list/<listName>", methods=["POST", "GET"])
 def listpage(listName):
     list_id = 0

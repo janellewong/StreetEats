@@ -32,10 +32,10 @@
 
           </div>
           <br><br><br><br><br><br><br>
-          <!-- <form action='/userpage' method="POST" class="createList"> -->
+
           <button class="btn btn-primary" style="float: right;" data-bs-toggle="modal" data-bs-target="#exampleModal"
-            type='submit'>Create a new list</button>
-          <!-- </form> -->
+            type='button'>Create a new list</button>
+
         </div>
       </div>
     </div>
@@ -48,19 +48,18 @@
             <h5 class="modal-title" id="exampleModalLabel">Create new List</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body">
-            <ul>
-              <form action="/" method="POST" class="createNewList">
-                <input type="text" placeholder="New List Name" name="newList" />
 
-            </ul>
+          <form action="/userpage" method="POST" class="createNewList">
+            <div class="modal-body">
+              <input type="text" placeholder="New List Name" name="newList" />
 
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Create List</button>
-          </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Create List</button>
+            </div>
           </form>
+
         </div>
       </div>
     </div>
@@ -88,6 +87,26 @@
   </div>
 </div>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type=text/javascript>
 
+$(document).ready(function() {
+$('.createNewList').submit(function (e) {
+  e.preventDefault();
+ 
+  $.ajax({
+      url:"/create-newList",
+      type:"POST",
+      cache:false,
+      data:$(e.target).serialize(),
+      success: function (data) {
+          console.log(data);
+         
+      }
+      });
+});
+});
+
+</script>
 
 {% endblock %}
