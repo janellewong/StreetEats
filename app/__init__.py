@@ -37,6 +37,13 @@ app.config[
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+def addRestaurantToList(listId, businessId):
+    from .db import listscontents, db
+    # insert into listscontents table
+    statement = listscontents.insert().values(list_id_fk=listId, business_id_fk=businessId)
+    db.session.execute(statement)
+    db.session.commit()
+
 
 def getListNames(userId):
     listName = []
@@ -240,6 +247,8 @@ def modalLike():
             indexName = listNames.index(entry)
             list_id = indexName + 1
     # now send business_id to list 2 in database
+
+    addRestaurantToList(list_id, business_id)
 
     print(listname)
     print(list_id)
