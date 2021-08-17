@@ -117,7 +117,7 @@ def createLikedList(userId):
 def createList(userId, listName):
     from .db import Lists, db
 
-    add_list = Lists(list_name=listName, user_id_fk=userId)
+    add_list = Lists(list_name=listName, user_id_fk=int(userId))
     db.session.add(add_list)
     print(userId, listName, flush=True)
     db.session.commit()
@@ -139,8 +139,8 @@ def index():
     category = ""
     city = None
 
-    # listNames = getListNames(1)
-    listNames = ["Food", "Coffee", "Indian"]  # TESTING PURPOSES
+    listNames = getListNames(1)
+    # listNames = ["Food", "Coffee", "Indian"]  # TESTING PURPOSES
 
     if request.method == "POST":
         city = request.form.get("city")
@@ -179,6 +179,7 @@ def index():
     # is business id already in db-list?
     # if it is, do nothing
     # if not, add to database
+    
 
     # print(business_data)
 
@@ -201,10 +202,10 @@ business_id = ""
 @app.route("/like-business", methods=["POST"])
 def likeBusiness():
     global business_id
-    business_id = request.form.get("business-id")
+    #business_id = request.form.get("business-id")
 
     # DB DATA HAS BEEN COMMENTED OUT FOR TESTING PURPOSES
-    """ from .db import BusinessList, listscontents, db
+    from .db import BusinessList, db
 
     business_data = request.form.get("business-id").split(", ")
     business_id = business_data[0].replace("'", "").replace(")", "").replace("(", "")
@@ -216,7 +217,7 @@ def likeBusiness():
     add_business = BusinessList(business_id=business_id, business_name=business_name)
     db.session.add(add_business)
     db.session.commit()
-
+    """
     # insert into listscontents table
     statement = listscontents.insert().values(list_id_fk=1, business_id_fk=business_id)
     db.session.execute(statement)
@@ -243,8 +244,6 @@ def modalLike():
     listNames = getListNames(1)
     # listNames = ["Food", "Coffee", "Indian"]  # TESTING PURPOSES
     listname = request.form.get("modal-liked")
-
-    list_id = 0
 
     for entry in listNames:
         if entry == listname:
@@ -303,7 +302,8 @@ listNameArray = []
 def userpage():
     global listNameArray
     # listNameArray = getListNames(1)
-    listNameArray = ["Food", "Coffee", "Good Stuff!!"]  # TESTING PURPOSES
+    # listNameArray = ["Food", "Coffee", "Good Stuff!!"]  # TESTING PURPOSES
+    listNameArray = getListNames(1)
     return render_template(
         "userpage.html", title="My Account", url=os.getenv("URL"), names=listNameArray
     )
@@ -312,13 +312,14 @@ def userpage():
 @app.route("/create-newList", methods=["POST"])
 def createNewList():
     newList_name = request.form.get("newList")
+    createList(1, newList_name)
 
     return '{"id":"%s","success":true}' % newList_name
 
 
 @app.route("/list/<listName>", methods=["POST", "GET"])
 def listpage(listName):
-    list_id = 0
+    list_id = 1
 
     for entry in listNameArray:
         if entry == listName:
