@@ -131,7 +131,7 @@
                             <form action='/' method="POST" class="like-form">
                                 <div style="text-align:right">
                                     Like Count: <span class="like-count">1</span>
-                                    <input type="hidden" name="business-id" value="{{entry['id']}}" />
+                                    <input type="hidden" name="business-id" value="{{entry['id'], entry['name']}}" />
                                     <button class="btn btn-primary" data-bs-toggle="modal"
                                         data-bs-target="#exampleModal" type="submit" name="like" id="like"
                                         value="like">Add
