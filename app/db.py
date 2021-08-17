@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 # from flask_migrate import Migrate
 from . import app
+from flask_login import UserMixin
 
 db = SQLAlchemy(app)
 # migrate = Migrate(app, db)
@@ -14,7 +15,7 @@ friends = db.Table('friends',
 )
 
 # create user table
-class UserModel(db.Model):
+class UserModel(db.Model, UserMixin):
     __tablename__ = "users"
     #Add user id, username, password columns
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -25,13 +26,26 @@ class UserModel(db.Model):
     friendship = db.relationship("UserModel",
                     secondary=friends,
                     primaryjoin=user_id==friends.c.user_id_fk,
-                    secondaryjoin=user_id==friends.c.friend_id,
+                    secondaryjoin=user_id==friends.c.friend_id_fk,
                     backref="followed_by"
     )
 
-    def __init__(self, username, password):
+    def __init__(self, user_id, username, password):
+        self.user_id = user_id
         self.username = username
         self.password = password
+
+    def is_active(self):
+       return True
+
+    def is_active(self):
+        return self.user_id
+    
+    def is_authenticated(self):
+        return self.authenticated
+
+    def get_id(self):
+        return int(self.user_id)
 
     def __repr__(self):
         return f"<User {self.username}>"
