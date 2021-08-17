@@ -2,7 +2,7 @@ import os
 from flask import Flask, render_template, request, g
 from dotenv import load_dotenv
 import requests
-from flask import request
+from flask import request, redirect, url_for
 from app.api import api_location
 from app.api import apiYelp
 from app.api import yelpReviews
@@ -11,6 +11,7 @@ from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
 load_dotenv()
 
@@ -19,6 +20,16 @@ app = Flask(__name__)
 
 lat, long = api_location()
 ENDPOINT_YELP, HEADERS_YELP = apiYelp()
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    from .db import UserModel
+# since the user_id is just the primary key of our user table, use it in the query for the user
+    return UserModel.query.filter_by(user_id=int(user_id)).first()
 
 #app.config[ "SQLALCHEMY_DATABASE_URI" ] = "postgresql://postgres:pass@localhost:5432/streeteatsdb"
 #app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -31,6 +42,10 @@ app.config['SQLALCHEMY_DATABASE_URI']= 'postgresql+psycopg2://{user}:{passwd}@{h
 	table=os.getenv('POSTGRES_DB'))
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
+app.config['SESSION_TYPE'] = 'filesystem' 
+app.config['SESSION_PERMANENT']= False
 
 ## todo return business ids from a list
 
@@ -72,7 +87,6 @@ class user_category:
 
     def repr(self):
         return self.type
-
 
 # restaurants
 @app.route("/", methods=["GET", "POST"])
@@ -257,13 +271,28 @@ def login():
             error = "Incorrect password."
 
         if error is None:
+
+            # userId = user.user_id
+            userId = UserModel.get_id(user)
             # Return home page upon successful registration, assuming it's "index.html"
-            return index()
+            # if the above check passes, then we know the user has the right credentials
+            login_user(user)
+            print("User information:::", flush=True)
+            print(current_user.user_id, flush=True)
+            # return redirect(url_for('main.profile'))
+            # return index()
+            return render_template("userhomepage.html")
         else:
             return error, 418
 
     # Return a login page
     return render_template("login.html")
+
+@login_required
+def logout():
+    logout_user()
+    return index()
+    # return redirect(url_for('main.index'))
 
 
 if __name__ == "__main__":
