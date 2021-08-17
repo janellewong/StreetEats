@@ -29,12 +29,6 @@
               </div>
             </div>
             {% endfor %}
-            <!-- 
-             <form action="{{ url_for('listpage' ,listName=test) }}" method="POST" class="list">
-                    <button class="card-title" type=submit>List Name from database</button>
-                    <input type="hidden" name="list" value="test" /> -->
-
-
 
           </div>
           <br><br><br><br><br><br><br>
@@ -49,7 +43,7 @@
           <div class="card-body">
             <h3 class="card-title">Find your Friends!!!</h3>
             <p class="card-text">Add your friends to see their restaurant lists!</p>
-            <form action="/" method="POST">
+            <form action="/userpage" method="POST">
               <div class="form-floating mb-3">
                 <input id="type" name="type" type="text" class="form-control" id="floatingInput" placeholder="Category">
                 <label for="floatingInput">Username</label>

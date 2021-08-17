@@ -10,6 +10,9 @@
     <meta property=" og:description" content="StreetEats">
     <meta property="og:url" content="{{ url }}">
 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
@@ -85,11 +88,9 @@
                             placeholder="City">
                         <label for="floatingInput">Location (City)</label>
                     </div>
+                    <button class="btn btn-primary" type="submit" id="submit" name="submit"
+                        value="search">Search</button>
 
-                    <a href="#test">
-                        <button class="btn btn-primary" type="submit" id="submit" name="submit"
-                            value="search">Search</button>
-                    </a>
 
                     <br><br>
                 </form>
@@ -98,19 +99,6 @@
 
         {% block content %}
 
-
-
-        {% if section %}
-        <script>
-            $(function () {
-                $("html, body").animate({ scrollTop: $("#{{ test }}").offset().top }, 500);
-            });
-        </script>
-        {% endif %}
-
-        <div id="test">
-            <p></p>
-        </div>
 
         <div class="searchresults" id="search-results">
             <!--SEARCH_RESULTS_START-->
@@ -139,11 +127,14 @@
                                 <br> <strong>Address: </strong>{{entry['location']['address1']}},
                                 {{entry['location']['city']}}, {{entry['location']['state']}}
                                 {{entry['location']['zip_code']}}, {{entry['location']['country']}}
+
                             <form action='/' method="POST" class="like-form">
                                 <div style="text-align:right">
                                     Like Count: <span class="like-count">1</span>
                                     <input type="hidden" name="business-id" value="{{entry['id']}}" />
-                                    <button class="btn btn-primary" type="submit" name="like" id="like" value="like">Add
+                                    <button class="btn btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#exampleModal" type="submit" name="like" id="like"
+                                        value="like">Add
                                         to list</button>
                                 </div>
                             </form>
@@ -157,10 +148,38 @@
                 </div>
             </div>
 
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Add to List</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            {% for listN in listName %}
+                            <ul>
+                                <form action="/" method="POST" class="modal-liked">
+                                    <button class="btn btn-primary" type="submit">{{listN}}</button>
+                                    <input type="hidden" name="modal-liked" value="{{listN}}" />
+                                </form>
+                            </ul>
+                            {% endfor %}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
 
             {% endfor %}
             <!--SEARCH_RESULTS_END-->
+
+
+
 
             {% endblock %}
 
@@ -170,9 +189,7 @@
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
             <script type=text/javascript>
 
-    // var ids = $(".idT")
-    // // var element = idT[5]
-    // console.log(ids)
+
     $(document).ready(function() {
         $('.search-form').submit(function (e) {
             e.preventDefault();
@@ -186,6 +203,10 @@
                     console.log(data);
                     var cleanedData = data.split('<!--SEARCH_RESULTS_START-->')[1].split('<!--SEARCH_RESULTS_END-->')[0]
                     $('#search-results').html(cleanedData);
+
+                    jQuery('html, body').animate({
+                scrollTop: jQuery("#search-results").offset().top
+                    }, 777);
                    
                 }
                 });
@@ -212,11 +233,29 @@
                 });
         });
 
+        $('.modal-liked').submit(function (e) {
+            e.preventDefault();
+           
+            $.ajax({
+                url:"/modal-like",
+                type:"POST",
+                cache:false,
+                data:$(e.target).serialize(),
+                success: function (data) {
+                    console.log(data);
+                   
+                }
+                });
+        });
+
         
     
 
     
 </script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+                integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+                crossorigin="anonymous"></script>
 
             <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
             <script src="https://unpkg.com/ionicons@5.5.1/dist/ionicons.js"></script>

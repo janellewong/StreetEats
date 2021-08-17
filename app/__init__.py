@@ -128,6 +128,9 @@ def index():
     category = ""
     city = None
 
+    # listNames = getListNames(1)
+    listNames = ["Food", "Coffee", "Indian"]  # TESTING PURPOSES
+
     if request.method == "POST":
         city = request.form.get("city")
         selection = request.form.get("type")
@@ -174,14 +177,19 @@ def index():
         title="StreetEats",
         url=os.getenv("URL"),
         data=business_data,
+        listName=listNames,
     )
 
     # if not logged in, do this
     # return render_template("userhomepage.html", title="StreetEats", url=os.getenv("URL"), data=business_data,)
 
 
+business_id = ""
+
+
 @app.route("/like-business", methods=["POST"])
 def likeBusiness():
+    global business_id
     business_id = request.form.get("business-id")
 
     # DB DATA HAS BEEN COMMENTED OUT FOR TESTING PURPOSES
@@ -219,6 +227,27 @@ def likeBusiness():
     return '{"id":"%s","success":true}' % business_id
 
 
+@app.route("/modal-like", methods=["POST"])
+def modalLike():
+    # listNames = getListNames(1)
+    listNames = ["Food", "Coffee", "Indian"]  # TESTING PURPOSES
+    listname = request.form.get("modal-liked")
+
+    list_id = 0
+
+    for entry in listNames:
+        if entry == listname:
+            indexName = listNames.index(entry)
+            list_id = indexName + 1
+    # now send business_id to list 2 in database
+
+    print(listname)
+    print(list_id)
+    print(business_id)
+
+    return '{"id":"%s","success":true}' % listname
+
+
 @app.route("/restaurant/<name>", methods=["POST"])
 def restaurant(name):
 
@@ -249,10 +278,15 @@ def userhomepage():
     return render_template("userhomepage.html", title="Homepage", url=os.getenv("URL"))
 
 
+@app.route("/settings")
+def settings():
+    return render_template("settings.html", title="Settings", url=os.getenv("URL"))
+
+
 listNameArray = []
 
 
-@app.route("/userpage")
+@app.route("/userpage", methods=["POST", "GET"])
 def userpage():
     global listNameArray
     # listName = getListNames(1)
@@ -272,7 +306,7 @@ def listpage(listName):
             list_id = indexName + 1
 
     idList = getBusinessId(list_id)
-    print(idList)
+    # print(idList)
 
     # THIS WORKS NOW
     SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
@@ -320,7 +354,7 @@ def listpage(listName):
             json.dump(file_data, file, indent=4)
 
         data = json.load(open(json_url))
-    print(data)
+    # print(data)
 
     return render_template(
         "listpage.html", title="My List", url=os.getenv("URL"), data=data, name=listName
