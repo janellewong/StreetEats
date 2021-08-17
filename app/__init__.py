@@ -51,6 +51,38 @@ def getListNames(userId):
     return listName
 
 
+## return business ids based on list name
+def getBusinessId(list_id):
+    idList = []
+
+    from .db import BusinessList, listscontents, db
+
+    # Read from listscontents table
+    ids = (
+        db.session.query(listscontents).filter_by(list_id_fk=list_id).all()
+    )  # list id parameter
+    for id in ids:
+        print(id.business_id_fk)
+        idList.append(id.business_id_fk)
+
+    return idList
+
+    """ if list_id == 1: TESTING METHOD
+        idList1 = [
+            "aarBX0VyJbjMACGCcMrfEQ",
+            "U8tIgXZ0T--8ZNEVoDap0g",
+        ]  # TESTING PURPOSES
+        return idList1
+
+    else:
+        idList1 = [
+            "aarBX0VyJbjMACGCcMrfEQ",
+            "2t-a8qkgoRiiohThDVjfNw",
+        ]  # TESTING PURPOSES
+
+        return idList1 """
+
+
 ## todo return friends
 def getFriends(userId):
     from .db import friends, db
@@ -59,6 +91,25 @@ def getFriends(userId):
     userIds = db.session.query(friends).filter_by(user_id_fk=1).all()
     for userId in userIds:
         print(userId.friend_id, flush=True)
+
+
+# creates a default liked list for every registered user
+def createLikedList(userId):
+    from .db import Lists, db
+
+    add_liked_list = Lists(list_name="Liked", user_id_fk=userId)
+    db.session.add(add_liked_list)
+    print(userId, flush=True)
+    db.session.commit()
+
+
+def createList(userId, listName):
+    from .db import Lists, db
+
+    add_list = Lists(list_name=listName, user_id_fk=userId)
+    db.session.add(add_list)
+    print(userId, listName, flush=True)
+    db.session.commit()
 
 
 class user_category:
@@ -129,14 +180,10 @@ def index():
     # return render_template("userhomepage.html", title="StreetEats", url=os.getenv("URL"), data=business_data,)
 
 
-idList = []  # for global array declaration
-
-
 @app.route("/like-business", methods=["POST"])
 def likeBusiness():
     business_id = request.form.get("business-id")
-    global idList
-    idList = ["aarBX0VyJbjMACGCcMrfEQ", "U8tIgXZ0T--8ZNEVoDap0g"]  # TESTING PURPOSE
+
     # DB DATA HAS BEEN COMMENTED OUT FOR TESTING PURPOSES
     """ from .db import BusinessList, listscontents, db
 
@@ -156,12 +203,7 @@ def likeBusiness():
     db.session.execute(statement)
     db.session.commit()
 
-    # Read from listscontents table
-    global idList
-    ids = db.session.query(listscontents).filter_by(list_id_fk=1).all()
-    for id in ids:
-        print(id.business_id_fk)
-        idList.append(id.business_id_fk) """
+    """
     #### returns business ids from a list == 1 #####
     # 4qyjRhjEgWGHPjgYWkBy8g
     # rCevbj5Zovz1sNqaEMlSNA
@@ -175,8 +217,6 @@ def likeBusiness():
     # [(1, '4qyjRhjEgWGHPjgYWkBy8g'), (1, 'rCevbj5Zovz1sNqaEMlSNA'), (1, '1TCm5Z71hpPaAl0PXr6S6g')]
 
     return '{"id":"%s","success":true}' % business_id
-
-    # return idList
 
 
 @app.route("/restaurant/<name>", methods=["POST"])
@@ -209,31 +249,44 @@ def userhomepage():
     return render_template("userhomepage.html", title="Homepage", url=os.getenv("URL"))
 
 
+listNameArray = []
+
+
 @app.route("/userpage")
 def userpage():
+    global listNameArray
     # listName = getListNames(1)
-    listName = ["Food", "Coffee", "Good Stuff!!"]  # TESTING PURPOSES
+    listNameArray = ["Food", "Coffee", "Good Stuff!!"]  # TESTING PURPOSES
     return render_template(
-        "userpage.html", title="My Account", url=os.getenv("URL"), names=listName
+        "userpage.html", title="My Account", url=os.getenv("URL"), names=listNameArray
     )
 
 
 @app.route("/list/<listName>", methods=["POST", "GET"])
 def listpage(listName):
-    idList1 = ["aarBX0VyJbjMACGCcMrfEQ", "U8tIgXZ0T--8ZNEVoDap0g"]  # TESTING PURPOSES
+    list_id = 0
+
+    for entry in listNameArray:
+        if entry == listName:
+            indexName = listNameArray.index(entry)
+            list_id = indexName + 1
+
+    idList = getBusinessId(list_id)
+    print(idList)
+
     # THIS WORKS NOW
     SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
     json_url = os.path.join(SITE_ROOT, "restaurantLiked.json")
+
     with open(json_url, "w") as file1:
         stuff = {"liked_businesses": []}
         json.dump(stuff, file1)
     file1.close()
 
-    for id in idList1:
+    for id in idList:
         ENDPOINT_YELPB = yelpBusinessInfo(id)
         responseB = requests.get(url=ENDPOINT_YELPB, headers=HEADERS_YELP)
         businessData = responseB.json()
-        print(businessData)
 
         # extract data from businessData to append to restaurantLiked.json
         id1 = businessData["id"]
@@ -267,10 +320,10 @@ def listpage(listName):
             json.dump(file_data, file, indent=4)
 
         data = json.load(open(json_url))
-        print(data)
+    print(data)
 
     return render_template(
-        "listpage.html", title="My List", url=os.getenv("URL"), data=data
+        "listpage.html", title="My List", url=os.getenv("URL"), data=data, name=listName
     )
 
 
@@ -305,12 +358,13 @@ def register():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    from .db import UserModel
 
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
         error = None
+        from .db import UserModel
+
         user = UserModel.query.filter_by(username=username).first()
 
         if user is None:
