@@ -37,10 +37,14 @@ app.config[
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+
 def addRestaurantToList(listId, businessId):
     from .db import listscontents, db
+
     # insert into listscontents table
-    statement = listscontents.insert().values(list_id_fk=listId, business_id_fk=businessId)
+    statement = listscontents.insert().values(
+        list_id_fk=listId, business_id_fk=businessId
+    )
     db.session.execute(statement)
     db.session.commit()
 
@@ -236,8 +240,8 @@ def likeBusiness():
 
 @app.route("/modal-like", methods=["POST"])
 def modalLike():
-    # listNames = getListNames(1)
-    listNames = ["Food", "Coffee", "Indian"]  # TESTING PURPOSES
+    listNames = getListNames(1)
+    # listNames = ["Food", "Coffee", "Indian"]  # TESTING PURPOSES
     listname = request.form.get("modal-liked")
 
     list_id = 0
@@ -298,7 +302,7 @@ listNameArray = []
 @app.route("/userpage", methods=["POST", "GET"])
 def userpage():
     global listNameArray
-    # listName = getListNames(1)
+    # listNameArray = getListNames(1)
     listNameArray = ["Food", "Coffee", "Good Stuff!!"]  # TESTING PURPOSES
     return render_template(
         "userpage.html", title="My Account", url=os.getenv("URL"), names=listNameArray
