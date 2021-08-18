@@ -1,30 +1,22 @@
 import os
-from flask import Flask, render_template, request, g
+from flask import Flask, render_template, request
 from dotenv import load_dotenv
 import requests
-from flask import request
-from . import api
 from app.api import api_location
 from app.api import apiYelp
 from app.api import yelpReviews
 from app.api import yelpBusinessInfo
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-import json
 from sqlalchemy.sql import select
 
 load_dotenv()
 
 app = Flask(__name__)
 
-
 lat, long = api_location()
 ENDPOINT_YELP, HEADERS_YELP = apiYelp()
 
-# app.config[ "SQLALCHEMY_DATABASE_URI" ] = "postgresql://postgres:pass@localhost:5432/streeteatsdb"
-# app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 app.config[
     "SQLALCHEMY_DATABASE_URI"
@@ -38,7 +30,7 @@ app.config[
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-
+# add list id and business id to listscontents table
 def addRestaurantToList(listId, businessId):
     from .db import listscontents, db
 
@@ -50,6 +42,7 @@ def addRestaurantToList(listId, businessId):
     db.session.commit()
 
 
+# gets a list of names of list
 def getListNames(userId):
     listName = []
     from .db import Lists, db
@@ -63,7 +56,7 @@ def getListNames(userId):
     return listName
 
 
-# take listIds from db
+# take listIds from Lists table db
 def getListIds():
     listIds = []
     from .db import db, Lists
@@ -76,11 +69,11 @@ def getListIds():
     return listIds
 
 
-## return business ids based on list name
+## return business ids based on list ids from listscontents
 def getBusinessId(list_id):
     idList = []
 
-    from .db import BusinessList, listscontents, db
+    from .db import listscontents, db
 
     # Read from listscontents table
     ids = (
@@ -92,23 +85,8 @@ def getBusinessId(list_id):
 
     return idList
 
-    """ if list_id == 1: TESTING METHOD
-        idList1 = [
-            "aarBX0VyJbjMACGCcMrfEQ",
-            "U8tIgXZ0T--8ZNEVoDap0g",
-        ]  # TESTING PURPOSES
-        return idList1
 
-    else:
-        idList1 = [
-            "aarBX0VyJbjMACGCcMrfEQ",
-            "2t-a8qkgoRiiohThDVjfNw",
-        ]  # TESTING PURPOSES
-
-        return idList1 """
-
-
-## todo return friends
+## return friends ids
 def getFriends(userId):
     from .db import friends, db
 
@@ -153,8 +131,8 @@ def index():
     category = ""
     city = None
 
+    ## add dynamic user
     listNames = getListNames(1)
-    # listNames = ["Food", "Coffee", "Indian"]  # TESTING PURPOSES
 
     if request.method == "POST":
         city = request.form.get("city")
@@ -217,7 +195,6 @@ def likeBusiness():
     global business_id
     # business_id = request.form.get("business-id")
 
-    # DB DATA HAS BEEN COMMENTED OUT FOR TESTING PURPOSES
     from .db import BusinessList, db
 
     business_data = request.form.get("business-id").split(", ")
@@ -230,54 +207,29 @@ def likeBusiness():
     add_business = BusinessList(business_id=business_id, business_name=business_name)
     db.session.add(add_business)
     db.session.commit()
-    """
-    # insert into listscontents table
-    statement = listscontents.insert().values(list_id_fk=1, business_id_fk=business_id)
-    db.session.execute(statement)
-    db.session.commit()
 
-    """
-    #### returns business ids from a list == 1 #####
-    # 4qyjRhjEgWGHPjgYWkBy8g
-    # rCevbj5Zovz1sNqaEMlSNA
-    # 1TCm5Z71hpPaAl0PXr6S6g
-    # glhCxpZ4OdUkXPp0jIqvPg
-    # pzg5nXrMocCzQIoTf57QJw
 
-    # ids = db.session.query(listscontents).filter_by(list_id_fk=1).all()
-    # print(ids)
-    #### returns an array of (list_id_fk, 'business_id_fk'), will need to extract ###
-    # [(1, '4qyjRhjEgWGHPjgYWkBy8g'), (1, 'rCevbj5Zovz1sNqaEMlSNA'), (1, '1TCm5Z71hpPaAl0PXr6S6g')]
 
     return '{"id":"%s","success":true}' % business_id
 
 
 @app.route("/modal-like", methods=["POST"])
 def modalLike():
+    ## add dynamic user
     listNames = getListNames(1)
-    # from .db import db, Lists
-
     listIds = getListIds()
-    # listNames = ["Food", "Coffee", "Indian"]  # TESTING PURPOSES
     listname = request.form.get("modal-liked")
-    print(listname)
+    # print(listname)
 
     for entry in listNames:
         if entry == listname:
             index = listNames.index(entry)
             list_id = listIds[index]
-    print(list_id)
+    # print(list_id)
 
-    """ # take listIds drom db
-    stmt = select([Lists.list_id])
-    results = db.session.execute(stmt).scalars()
-    for result in results:
-        listIds.append(result) """
+    # print(listIds, flush=True)
 
-    # print(result, flush=True)
-    print(listIds, flush=True)
-
-    # addRestaurantToList(list_id, business_id)
+    addRestaurantToList(list_id, business_id)
 
     return '{"id":"%s","success":true}' % listname
 
@@ -323,7 +275,8 @@ listNameArray = []
 @app.route("/userpage", methods=["POST", "GET"])
 def userpage():
     global listNameArray
-    # listNameArray = ["Food", "Coffee", "Good Stuff!!"]  # TESTING PURPOSES
+
+    ## make dynamic for user logged in
     listNameArray = getListNames(1)
 
     return render_template(
@@ -334,6 +287,7 @@ def userpage():
 @app.route("/create-newList", methods=["POST"])
 def createNewList():
     newList_name = request.form.get("newList")
+    ## need to make dynamic for user
     createList(1, newList_name)
 
     return '{"id":"%s","success":true}' % newList_name
@@ -342,33 +296,30 @@ def createNewList():
 @app.route("/list/<listName>", methods=["POST", "GET"])
 def listpage(listName):
 
+    # get list of ids from the List table
     listIds = getListIds()
 
+    # loop to match listname and match to id
     for entry in listNameArray:
         if entry == listName:
             index = listNameArray.index(entry)
             list_id = listIds[index]
 
-    print(list_id)
+    # print(list_id)
 
     idList = getBusinessId(list_id)
     # print(idList)
 
-    # THIS WORKS NOW
-    SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
-    json_url = os.path.join(SITE_ROOT, "restaurantLiked.json")
-
-    with open(json_url, "w") as file1:
-        stuff = {"liked_businesses": []}
-        json.dump(stuff, file1)
-    file1.close()
+    liked_businesses = []
 
     for id in idList:
         ENDPOINT_YELPB = yelpBusinessInfo(id)
         responseB = requests.get(url=ENDPOINT_YELPB, headers=HEADERS_YELP)
         businessData = responseB.json()
 
-        # extract data from businessData to append to restaurantLiked.json
+        # extract data from businessData to append to liked_businesses
+        # price currently doesn't pull from API - check later
+
         id1 = businessData["id"]
         name = businessData["name"]
         # price = businessData["price"]
@@ -385,25 +336,10 @@ def listpage(listName):
             "address": address,
         }
 
-        # idea: first clear the json file THEN follow through with code to append so there is no overlap in data
-
-        # this opens the json file and appends data to it to get it to display in html
-        with open(json_url, "r+") as file:
-            # First we load existing data into a dict.
-            file_data = json.load(file)
-
-            # Join new_data with file_data inside emp_details
-            file_data["liked_businesses"].append(new_data)
-            # Sets file's current position at offset.
-            file.seek(0)
-            # convert back to json.
-            json.dump(file_data, file, indent=4)
-
-    data = json.load(open(json_url))
-    print(data, flush=True)
+        liked_businesses.append(new_data)    
 
     return render_template(
-        "listpage.html", title="My List", url=os.getenv("URL"), data=data, name=listName
+        "listpage.html", title="My List", url=os.getenv("URL"), data={"liked_businesses":liked_businesses}, name=listName
     )
 
 
