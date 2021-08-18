@@ -13,6 +13,7 @@ from werkzeug.security import check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import json
+from sqlalchemy.sql import select
 
 load_dotenv()
 
@@ -242,20 +243,28 @@ def likeBusiness():
 @app.route("/modal-like", methods=["POST"])
 def modalLike():
     listNames = getListNames(1)
+    from .db import db, Lists
+    listIds = []
     # listNames = ["Food", "Coffee", "Indian"]  # TESTING PURPOSES
     listname = request.form.get("modal-liked")
+    stmt = select([Lists.list_id])
+    results = db.session.execute(stmt).scalars()
+    for result in results:
+        listIds.append(result)
+        # print(result, flush=True)
+    print(listIds, flush=True)
 
-    for entry in listNames:
-        if entry == listname:
-            indexName = listNames.index(entry)
-            list_id = indexName + 1
+    # for entry in listNames:
+    #     if entry == listname:
+    #         indexName = listNames.index(entry)
+    #         list_id = indexName + 1
     # now send business_id to list 2 in database
 
-    addRestaurantToList(list_id, business_id)
+    # addRestaurantToList(list_id, business_id)
 
-    print(listname)
-    print(list_id)
-    print(business_id)
+    # print(listname)
+    # print(list_id)
+    # print(business_id)
 
     return '{"id":"%s","success":true}' % listname
 
@@ -319,7 +328,7 @@ def createNewList():
 
 @app.route("/list/<listName>", methods=["POST", "GET"])
 def listpage(listName):
-    list_id = 1
+    list_id = 0
 
     for entry in listNameArray:
         if entry == listName:
@@ -346,7 +355,7 @@ def listpage(listName):
         # extract data from businessData to append to restaurantLiked.json
         id1 = businessData["id"]
         name = businessData["name"]
-        price = businessData["price"]
+        #price = businessData["price"]
         rating = businessData["rating"]
         phone = businessData["display_phone"]
         address = businessData["location"]["address1"]
@@ -354,7 +363,7 @@ def listpage(listName):
         new_data = {
             "id": id1,
             "name": name,
-            "price": price,
+            #"price": price,
             "rating": rating,
             "phone": phone,
             "address": address,
@@ -374,8 +383,8 @@ def listpage(listName):
             # convert back to json.
             json.dump(file_data, file, indent=4)
 
-        data = json.load(open(json_url))
-    # print(data)
+    data = json.load(open(json_url))
+    print(data, flush=True)
 
     return render_template(
         "listpage.html", title="My List", url=os.getenv("URL"), data=data, name=listName
