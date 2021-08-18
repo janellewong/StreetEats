@@ -1,14 +1,53 @@
 {% extends "userview.html" %}
 
 {% block content %}
-<div>
-    <p>Change username: <input id=changeUser name=changeUser placeholder=username></p>
-    <p>Change password: <input id=changePass name=changePass placeholder=password></p>
 
+<!-- <p>Change username: <input id=changeUser name=changeUser placeholder=username></p>
+<p>Change password: <input id=changePass name=changePass placeholder=password></p> -->
 
+<div class="login">
+    <div class="card">
+        <div class="reg-paddingl">
+            <div class="card-body" style="color: black;">
+                <h5 class="login-words" style="font-size: 30px">Settings</h5>
+                <br>
 
+                <form action="/login" method="POST">
+                    <div class="msg"> </div>
 
+                    <h4>Change Username:</h4>
+                    <div class="form-floating mb-3">
+                        <input id ="changeUser" name ="changeUser" type="text" class="form-control" id="floatingInput" placeholder="Username">
+                        <label for="floatingInput">New username</label>
+                    </div>
+                    <br><br>
+
+                    <h4>Change Password:</h4>
+                    <div class="form-floating">
+                        <input id ="changePass" name ="changePass" type="password" class="form-control" id="floatingPassword" placeholder="Password">
+                        <label for="floatingPassword">Old password</label>
+                    </div>
+
+                    <br>
+                    
+                    <div class="form-floating">
+                        <input id ="changePass" name ="changePass" type="password" class="form-control" id="floatingPassword" placeholder="Password">
+                        <label for="floatingPassword">New password</label>
+                    </div>
+                    <br>
+                    <div class=button-padding>
+                        <div class="col-12">
+                            <button class="btn btn-primary" type="submit">Save</button>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
 </div>
+
+
 
 
 {% endblock %}
