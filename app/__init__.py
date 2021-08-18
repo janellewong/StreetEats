@@ -9,7 +9,6 @@ from app.api import yelpBusinessInfo
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from sqlalchemy.sql import select
-from .db import db, UserModel, Lists, friends, listscontents
 
 load_dotenv()
 
@@ -350,6 +349,7 @@ def listpage(listName):
 @app.route("/register", methods=["GET", "POST"])
 def register():
     from .db import UserModel, db
+
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
