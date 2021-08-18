@@ -349,6 +349,7 @@ def listpage(listName):
 @app.route("/register", methods=["GET", "POST"])
 def register():
     from .db import UserModel, db
+
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
