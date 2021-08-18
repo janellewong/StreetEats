@@ -63,6 +63,19 @@ def getListNames(userId):
     return listName
 
 
+# take listIds from db
+def getListIds():
+    listIds = []
+    from .db import db, Lists
+
+    stmt = select([Lists.list_id])
+    results = db.session.execute(stmt).scalars()
+    for result in results:
+        listIds.append(result)
+
+    return listIds
+
+
 ## return business ids based on list name
 def getBusinessId(list_id):
     idList = []
@@ -180,7 +193,6 @@ def index():
     # is business id already in db-list?
     # if it is, do nothing
     # if not, add to database
-    
 
     # print(business_data)
 
@@ -203,7 +215,7 @@ business_id = ""
 @app.route("/like-business", methods=["POST"])
 def likeBusiness():
     global business_id
-    #business_id = request.form.get("business-id")
+    # business_id = request.form.get("business-id")
 
     # DB DATA HAS BEEN COMMENTED OUT FOR TESTING PURPOSES
     from .db import BusinessList, db
@@ -243,28 +255,29 @@ def likeBusiness():
 @app.route("/modal-like", methods=["POST"])
 def modalLike():
     listNames = getListNames(1)
-    from .db import db, Lists
-    listIds = []
+    # from .db import db, Lists
+
+    listIds = getListIds()
     # listNames = ["Food", "Coffee", "Indian"]  # TESTING PURPOSES
     listname = request.form.get("modal-liked")
+    print(listname)
+
+    for entry in listNames:
+        if entry == listname:
+            index = listNames.index(entry)
+            list_id = listIds[index]
+    print(list_id)
+
+    """ # take listIds drom db
     stmt = select([Lists.list_id])
     results = db.session.execute(stmt).scalars()
     for result in results:
-        listIds.append(result)
-        # print(result, flush=True)
+        listIds.append(result) """
+
+    # print(result, flush=True)
     print(listIds, flush=True)
 
-    # for entry in listNames:
-    #     if entry == listname:
-    #         indexName = listNames.index(entry)
-    #         list_id = indexName + 1
-    # now send business_id to list 2 in database
-
     # addRestaurantToList(list_id, business_id)
-
-    # print(listname)
-    # print(list_id)
-    # print(business_id)
 
     return '{"id":"%s","success":true}' % listname
 
@@ -310,9 +323,9 @@ listNameArray = []
 @app.route("/userpage", methods=["POST", "GET"])
 def userpage():
     global listNameArray
-    # listNameArray = getListNames(1)
     # listNameArray = ["Food", "Coffee", "Good Stuff!!"]  # TESTING PURPOSES
     listNameArray = getListNames(1)
+
     return render_template(
         "userpage.html", title="My Account", url=os.getenv("URL"), names=listNameArray
     )
@@ -328,12 +341,15 @@ def createNewList():
 
 @app.route("/list/<listName>", methods=["POST", "GET"])
 def listpage(listName):
-    list_id = 0
+
+    listIds = getListIds()
 
     for entry in listNameArray:
         if entry == listName:
-            indexName = listNameArray.index(entry)
-            list_id = indexName + 1
+            index = listNameArray.index(entry)
+            list_id = listIds[index]
+
+    print(list_id)
 
     idList = getBusinessId(list_id)
     # print(idList)
@@ -355,7 +371,7 @@ def listpage(listName):
         # extract data from businessData to append to restaurantLiked.json
         id1 = businessData["id"]
         name = businessData["name"]
-        #price = businessData["price"]
+        # price = businessData["price"]
         rating = businessData["rating"]
         phone = businessData["display_phone"]
         address = businessData["location"]["address1"]
@@ -363,7 +379,7 @@ def listpage(listName):
         new_data = {
             "id": id1,
             "name": name,
-            #"price": price,
+            # "price": price,
             "rating": rating,
             "phone": phone,
             "address": address,

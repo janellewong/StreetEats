@@ -161,7 +161,8 @@
                             {% for listN in listName %}
                             <ul>
                                 <form action="/" method="POST" class="modal-liked">
-                                    <button class="btn btn-primary" type="submit">{{listN}}</button>
+                                    <button class="btn btn-primary" data-bs-dismiss="modal"
+                                        type="submit">{{listN}}</button>
                                     <input type="hidden" name="modal-liked" value="{{listN}}" />
                                 </form>
                             </ul>
@@ -177,9 +178,6 @@
 
             {% endfor %}
             <!--SEARCH_RESULTS_END-->
-
-
-
 
             {% endblock %}
 
@@ -204,8 +202,40 @@
                     var cleanedData = data.split('<!--SEARCH_RESULTS_START-->')[1].split('<!--SEARCH_RESULTS_END-->')[0]
                     $('#search-results').html(cleanedData);
 
+                    $('.like-form').submit(function (e) {
+                            e.preventDefault();
+                           
+                            $.ajax({
+                                url:"/like-business",
+                                type:"POST",
+                                cache:false,
+                                data:$(e.target).serialize(),
+                                success: function (data) {
+                                    console.log(data);
+                                    var likeCountSpan = $(e.target).find('.like-count')[0]
+                                    var newLikeCount = Number(likeCountSpan.innerText) + 1
+                                    likeCountSpan.innerText = `${newLikeCount}`
+                                }
+                                });
+                        });
+
+                        $('.modal-liked').submit(function (e) {
+                             e.preventDefault();
+           
+                            $.ajax({
+                                url:"/modal-like",
+                                type:"POST",
+                                cache:false,
+                                data:$(e.target).serialize(),
+                                success: function (data) {
+                                    console.log(data);
+                                
+                                }
+                                });
+                        });
+
                     jQuery('html, body').animate({
-                scrollTop: jQuery("#search-results").offset().top
+                        scrollTop: jQuery("#search-results").offset().top
                     }, 777);
                    
                 }
