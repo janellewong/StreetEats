@@ -208,8 +208,6 @@ def likeBusiness():
     db.session.add(add_business)
     db.session.commit()
 
-
-
     return '{"id":"%s","success":true}' % business_id
 
 
@@ -336,10 +334,14 @@ def listpage(listName):
             "address": address,
         }
 
-        liked_businesses.append(new_data)    
+        liked_businesses.append(new_data)
 
     return render_template(
-        "listpage.html", title="My List", url=os.getenv("URL"), data={"liked_businesses":liked_businesses}, name=listName
+        "listpage.html",
+        title="My List",
+        url=os.getenv("URL"),
+        data={"liked_businesses": liked_businesses},
+        name=listName,
     )
 
 
