@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Configure SSH
-        run: |
+        run: | 
           mkdir -p ~/.ssh/
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy-key.pem
           chmod 600 ~/.ssh/deploy-key.pem
@@ -28,26 +28,10 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SSH_IP: ${{ secrets.SSH_IP }}
 
-      - name: SSH into AWS instance and deploy portfolio 
-        run: >
-          ssh my-vm 'cd ${{ secrets.PROJECT_ROOT }} && git fetch && git reset 
-          --hard origin/master && docker-compose down && docker-compose up -d --build'
-      
-      - name: Print container information
-        run: |
-          ssh my-vm 'cd ${{ secrets.PROJECT_ROOT }} && docker-compose ps'
-      
-      - name: Check out repository
-        uses: actions/checkout@v2
-        with:
-          repository: janellewong/StreetEats
-
-      - name: Test deployment
-        run: |
-          chmod +x prod-test.sh
-          ./prod-test.sh
-          
-      - name: Check deployment failure
-        if: ${{ failure() }}
-        run: |
-          curl -s -X POST "${{ secrets.DISCORD_WEBHOOK }}" -d "content=🚨 Deployment Failed"
+      -  name: Print project root directory
+         run: >
+           ssh my-vm 'cd ${{ secrets.PROJECT_ROOT }}
+           && sudo git fetch
+           && sudo git reset --hard origin/main
+           && docker-compose down
+           && docker-compose up -d --build'
