@@ -9,10 +9,17 @@ from app.api import yelpBusinessInfo
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from sqlalchemy.sql import select
+from flask import Flask, g
+from flask import session
+from dotenv import load_dotenv
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from . import app
 
 load_dotenv()
 
 app = Flask(__name__)
+
 
 lat, long = api_location()
 ENDPOINT_YELP, HEADERS_YELP = apiYelp()
@@ -30,9 +37,109 @@ app.config[
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
+friends = db.Table(
+    "friends",
+    db.Column(
+        "user_id_fk", db.Integer, db.ForeignKey("users.user_id"), primary_key=True
+    ),
+    db.Column(
+        "friend_id", db.Integer, db.ForeignKey("users.user_id"), primary_key=True
+    ),
+)
+
+# create user table
+class UserModel(db.Model):
+    __tablename__ = "users"
+    # Add user id, username, password columns
+    user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    username = db.Column(db.String())
+    password = db.Column(db.String())
+    lists = db.relationship("Lists", backref="List_OwnerID")
+    # User has lists that refers to Lists db
+    friendship = db.relationship(
+        "UserModel",
+        secondary=friends,
+        primaryjoin=user_id == friends.c.user_id_fk,
+        secondaryjoin=user_id == friends.c.friend_id,
+        backref="followed_by",
+    )
+
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
+
+    def __repr__(self):
+        return f"<User {self.username}>"
+
+
+listscontents = db.Table(
+    "listscontents",
+    db.Column("list_id_fk", db.Integer, db.ForeignKey("lists.list_id")),
+    db.Column("business_id_fk", db.String, db.ForeignKey("businesses.business_id")),
+)
+
+
+class Lists(db.Model):
+    __tablename__ = "lists"
+    # Add id number of user who owns list, name of list, list_id number columns
+    list_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    list_name = db.Column(db.String())
+    user_id_fk = db.Column(db.Integer, db.ForeignKey("users.user_id"))
+    listContents = db.relationship(
+        "BusinessList",
+        secondary=listscontents,
+        backref=db.backref("lists", lazy="dynamic"),
+        lazy="dynamic",
+    )
+    # List db has businesses that refers to BusinessList/businesses db
+
+    ### Need Help with where / how to connect and assign attributes for each user here
+    def __init__(self, list_name, user_id_fk):
+        self.list_name = list_name
+        self.user_id_fk = user_id_fk
+
+    # def __repr__(self):
+    #    return f"User {username} has list {}." # confused here
+    #    self.business_id = #RETRIEVE from api
+    #    self.business_name = #Restrieve id from api then retrieve name
+    #    self.list_id = #Retrieve from lists db
+
+
+class BusinessList(db.Model):
+    __tablename__ = "businesses"
+    # Add id number of list, name of business, business_id columns
+    business_id = db.Column(db.String, primary_key=True)
+    business_name = db.Column(db.String())
+    # list_id = db.Column(db.Integer, db.ForeignKey("lists.list_id"))
+
+    ### Need Help with where / how to connect and assign attributes for each business here
+    def __init__(self, business_id, business_name):
+        self.business_id = business_id
+        self.business_name = business_name
+        # self.list_id = list_id
+
+    # def __repr__(self):
+    #    return f"User {username} has list {}." # confused here
+    #    self.business_id = #RETRIEVE from api
+    #    self.business_name = #Restrieve id from api then retrieve name
+    #    self.list_id = #Retrieve from lists db
+
+
+# class FriendModel(db.Model):
+#     ___tablename___ = "friends"
+
+#     user_id_fk = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+#     friend_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+
+load_dotenv()
+db.create_all()
+
 # add list id and business id to listscontents table
 def addRestaurantToList(listId, businessId):
-    from .db import listscontents, db
+    # from .db import listscontents, db
 
     # insert into listscontents table
     statement = listscontents.insert().values(
@@ -45,7 +152,7 @@ def addRestaurantToList(listId, businessId):
 # gets a list of names of list
 def getListNames(userId):
     listName = []
-    from .db import Lists, db
+    # from .db import Lists, db
 
     # get list names from user_id_fk
     listIds = db.session.query(Lists).filter_by(user_id_fk=1).all()
@@ -59,7 +166,7 @@ def getListNames(userId):
 # take listIds from Lists table db
 def getListIds():
     listIds = []
-    from .db import db, Lists
+    # from .db import db, Lists
 
     stmt = select([Lists.list_id])
     results = db.session.execute(stmt).scalars()
@@ -73,7 +180,7 @@ def getListIds():
 def getBusinessId(list_id):
     idList = []
 
-    from .db import listscontents, db
+    # from .db import listscontents, db
 
     # Read from listscontents table
     ids = (
@@ -98,7 +205,7 @@ def getFriends(userId):
 
 # creates a default liked list for every registered user
 def createLikedList(userId):
-    from .db import Lists, db
+    # from .db import Lists, db
 
     add_liked_list = Lists(list_name="Liked", user_id_fk=userId)
     db.session.add(add_liked_list)
@@ -107,7 +214,7 @@ def createLikedList(userId):
 
 
 def createList(userId, listName):
-    from .db import Lists, db
+    # from .db import Lists, db
 
     add_list = Lists(list_name=listName, user_id_fk=int(userId))
     db.session.add(add_list)
@@ -196,7 +303,7 @@ def likeBusiness():
     global business_id
     # business_id = request.form.get("business-id")
 
-    from .db import BusinessList, db
+    # from .db import BusinessList, db
 
     business_data = request.form.get("business-id").split(", ")
     business_id = business_data[0].replace("'", "").replace(")", "").replace("(", "")
@@ -348,7 +455,7 @@ def listpage(listName):
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    from .db import UserModel, db
+    # from .db import UserModel, db
 
     if request.method == "POST":
         username = request.form.get("username")
@@ -382,7 +489,7 @@ def login():
         username = request.form.get("username")
         password = request.form.get("password")
         error = None
-        from .db import UserModel
+        # from .db import UserModel
 
         user = UserModel.query.filter_by(username=username).first()
 
