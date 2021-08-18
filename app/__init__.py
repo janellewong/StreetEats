@@ -9,6 +9,7 @@ from app.api import yelpBusinessInfo
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from sqlalchemy.sql import select
+from .db import db, UserModel, Lists, friends, listscontents
 
 load_dotenv()
 
