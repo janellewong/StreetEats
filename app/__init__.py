@@ -1,22 +1,18 @@
 import os
-from flask import Flask, render_template, request, g
+from flask import Flask, render_template, request
 from dotenv import load_dotenv
 import requests
-from flask import request
-from . import api
 from app.api import api_location
 from app.api import apiYelp
 from app.api import yelpReviews
 from app.api import yelpBusinessInfo
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
+from sqlalchemy.sql import select
 
 load_dotenv()
 
 app = Flask(__name__)
-
 
 lat, long = api_location()
 ENDPOINT_YELP, HEADERS_YELP = apiYelp()
@@ -34,6 +30,90 @@ app.config[
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+# add list id and business id to listscontents table
+def addRestaurantToList(listId, businessId):
+    from .db import listscontents, db
+
+    # insert into listscontents table
+    statement = listscontents.insert().values(
+        list_id_fk=listId, business_id_fk=businessId
+    )
+    db.session.execute(statement)
+    db.session.commit()
+
+
+# gets a list of names of list
+def getListNames(userId):
+    listName = []
+    from .db import Lists, db
+
+    # get list names from user_id_fk
+    listIds = db.session.query(Lists).filter_by(user_id_fk=1).all()
+    for listId in listIds:
+        print(listId.list_name, flush=True)
+        listName.append(listId.list_name)
+
+    return listName
+
+
+# take listIds from Lists table db
+def getListIds():
+    listIds = []
+    from .db import db, Lists
+
+    stmt = select([Lists.list_id])
+    results = db.session.execute(stmt).scalars()
+    for result in results:
+        listIds.append(result)
+
+    return listIds
+
+
+## return business ids based on list ids from listscontents
+def getBusinessId(list_id):
+    idList = []
+
+    from .db import listscontents, db
+
+    # Read from listscontents table
+    ids = (
+        db.session.query(listscontents).filter_by(list_id_fk=list_id).all()
+    )  # list id parameter
+    for id in ids:
+        print(id.business_id_fk)
+        idList.append(id.business_id_fk)
+
+    return idList
+
+
+## return friends ids
+def getFriends(userId):
+    from .db import friends, db
+
+    # get names from friends table from user_id_fk
+    userIds = db.session.query(friends).filter_by(user_id_fk=1).all()
+    for userId in userIds:
+        print(userId.friend_id, flush=True)
+
+
+# creates a default liked list for every registered user
+def createLikedList(userId):
+    from .db import Lists, db
+
+    add_liked_list = Lists(list_name="Liked", user_id_fk=userId)
+    db.session.add(add_liked_list)
+    print(userId, flush=True)
+    db.session.commit()
+
+
+def createList(userId, listName):
+    from .db import Lists, db
+
+    add_list = Lists(list_name=listName, user_id_fk=int(userId))
+    db.session.add(add_list)
+    print(userId, listName, flush=True)
+    db.session.commit()
+
 
 class user_category:
     def __init__(self, type, location):
@@ -50,6 +130,9 @@ def index():
     testLocation = "toronto"
     category = ""
     city = None
+
+    ## add dynamic user
+    listNames = getListNames(1)
 
     if request.method == "POST":
         city = request.form.get("city")
@@ -97,19 +180,56 @@ def index():
         title="StreetEats",
         url=os.getenv("URL"),
         data=business_data,
+        listName=listNames,
     )
 
     # if not logged in, do this
     # return render_template("userhomepage.html", title="StreetEats", url=os.getenv("URL"), data=business_data,)
 
 
+business_id = ""
+
+
 @app.route("/like-business", methods=["POST"])
 def likeBusiness():
-    business_id = request.form.get("business-id")
+    global business_id
+    # business_id = request.form.get("business-id")
 
-    # Save to db or something
+    from .db import BusinessList, db
+
+    business_data = request.form.get("business-id").split(", ")
+    business_id = business_data[0].replace("'", "").replace(")", "").replace("(", "")
+    business_name = business_data[1].replace("'", "").replace(")", "").replace("(", "")
+    # print(business_id, flush=True)
+    # print(business_name, flush=True)
+
+    # insert into business table
+    add_business = BusinessList(business_id=business_id, business_name=business_name)
+    db.session.add(add_business)
+    db.session.commit()
 
     return '{"id":"%s","success":true}' % business_id
+
+
+@app.route("/modal-like", methods=["POST"])
+def modalLike():
+    ## add dynamic user
+    listNames = getListNames(1)
+    listIds = getListIds()
+    listname = request.form.get("modal-liked")
+    # print(listname)
+
+    for entry in listNames:
+        if entry == listname:
+            index = listNames.index(entry)
+            list_id = listIds[index]
+    # print(list_id)
+
+    # print(listIds, flush=True)
+
+    addRestaurantToList(list_id, business_id)
+
+    return '{"id":"%s","success":true}' % listname
 
 
 @app.route("/restaurant/<name>", methods=["POST"])
@@ -142,14 +262,87 @@ def userhomepage():
     return render_template("userhomepage.html", title="Homepage", url=os.getenv("URL"))
 
 
-@app.route("/userpage")
+@app.route("/settings")
+def settings():
+    return render_template("settings.html", title="Settings", url=os.getenv("URL"))
+
+
+listNameArray = []
+
+
+@app.route("/userpage", methods=["POST", "GET"])
 def userpage():
-    return render_template("userpage.html", title="My Account", url=os.getenv("URL"))
+    global listNameArray
+
+    ## make dynamic for user logged in
+    listNameArray = getListNames(1)
+
+    return render_template(
+        "userpage.html", title="My Account", url=os.getenv("URL"), names=listNameArray
+    )
 
 
-@app.route("/listpage")
-def listpage():
-    return render_template("listpage.html", title="My List", url=os.getenv("URL"))
+@app.route("/create-newList", methods=["POST"])
+def createNewList():
+    newList_name = request.form.get("newList")
+    ## need to make dynamic for user
+    createList(1, newList_name)
+
+    return '{"id":"%s","success":true}' % newList_name
+
+
+@app.route("/list/<listName>", methods=["POST", "GET"])
+def listpage(listName):
+
+    # get list of ids from the List table
+    listIds = getListIds()
+
+    # loop to match listname and match to id
+    for entry in listNameArray:
+        if entry == listName:
+            index = listNameArray.index(entry)
+            list_id = listIds[index]
+
+    # print(list_id)
+
+    idList = getBusinessId(list_id)
+    # print(idList)
+
+    liked_businesses = []
+
+    for id in idList:
+        ENDPOINT_YELPB = yelpBusinessInfo(id)
+        responseB = requests.get(url=ENDPOINT_YELPB, headers=HEADERS_YELP)
+        businessData = responseB.json()
+
+        # extract data from businessData to append to liked_businesses
+        # price currently doesn't pull from API - check later
+
+        id1 = businessData["id"]
+        name = businessData["name"]
+        # price = businessData["price"]
+        rating = businessData["rating"]
+        phone = businessData["display_phone"]
+        address = businessData["location"]["address1"]
+
+        new_data = {
+            "id": id1,
+            "name": name,
+            # "price": price,
+            "rating": rating,
+            "phone": phone,
+            "address": address,
+        }
+
+        liked_businesses.append(new_data)
+
+    return render_template(
+        "listpage.html",
+        title="My List",
+        url=os.getenv("URL"),
+        data={"liked_businesses": liked_businesses},
+        name=listName,
+    )
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -183,12 +376,13 @@ def register():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    from .db import UserModel
 
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
         error = None
+        from .db import UserModel
+
         user = UserModel.query.filter_by(username=username).first()
 
         if user is None:
