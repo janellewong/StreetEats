@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, g
+from flask import Flask, render_template, request
 from dotenv import load_dotenv
 import requests
 from flask import request, redirect, url_for
@@ -9,6 +9,10 @@ from app.api import yelpReviews
 from app.api import yelpBusinessInfo
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
+from sqlalchemy.sql import select
+from flask import Flask, g
+from flask import session
+from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
@@ -31,15 +35,16 @@ def load_user(user_id):
 # since the user_id is just the primary key of our user table, use it in the query for the user
     return UserModel.query.filter_by(user_id=int(user_id)).first()
 
-#app.config[ "SQLALCHEMY_DATABASE_URI" ] = "postgresql://postgres:pass@localhost:5432/streeteatsdb"
-#app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-app.config['SQLALCHEMY_DATABASE_URI']= 'postgresql+psycopg2://{user}:{passwd}@{host}:{port}/{table}'.format(
-	user=os.getenv('POSTGRES_USER'),
-	passwd=os.getenv('POSTGRES_PASSWORD'),
-	host=os.getenv('POSTGRES_HOST'),
-	port=5432,
-	table=os.getenv('POSTGRES_DB'))
+app.config[
+    "SQLALCHEMY_DATABASE_URI"
+] = "postgresql+psycopg2://{user}:{passwd}@{host}:{port}/{table}".format(
+    user=os.getenv("POSTGRES_USER"),
+    passwd=os.getenv("POSTGRES_PASSWORD"),
+    host=os.getenv("POSTGRES_HOST"),
+    port=5432,
+    table=os.getenv("POSTGRES_DB"),
+)
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -47,35 +52,186 @@ app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
 app.config['SESSION_TYPE'] = 'filesystem' 
 app.config['SESSION_PERMANENT']= False
 
-## todo return business ids from a list
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
-## todo return list names for a user
+friends = db.Table(
+    "friends",
+    db.Column(
+        "user_id_fk", db.Integer, db.ForeignKey("users.user_id"), primary_key=True
+    ),
+    db.Column(
+        "friend_id", db.Integer, db.ForeignKey("users.user_id"), primary_key=True
+    ),
+)
+
+# create user table
+class UserModel(db.Model):
+    __tablename__ = "users"
+    # Add user id, username, password columns
+    user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    username = db.Column(db.String())
+    password = db.Column(db.String())
+    lists = db.relationship("Lists", backref="List_OwnerID")
+    # User has lists that refers to Lists db
+    friendship = db.relationship(
+        "UserModel",
+        secondary=friends,
+        primaryjoin=user_id == friends.c.user_id_fk,
+        secondaryjoin=user_id == friends.c.friend_id,
+        backref="followed_by",
+    )
+
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
+
+    def __repr__(self):
+        return f"<User {self.username}>"
+
+
+listscontents = db.Table(
+    "listscontents",
+    db.Column("list_id_fk", db.Integer, db.ForeignKey("lists.list_id")),
+    db.Column("business_id_fk", db.String, db.ForeignKey("businesses.business_id")),
+)
+
+
+class Lists(db.Model):
+    __tablename__ = "lists"
+    # Add id number of user who owns list, name of list, list_id number columns
+    list_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    list_name = db.Column(db.String())
+    user_id_fk = db.Column(db.Integer, db.ForeignKey("users.user_id"))
+    listContents = db.relationship(
+        "BusinessList",
+        secondary=listscontents,
+        backref=db.backref("lists", lazy="dynamic"),
+        lazy="dynamic",
+    )
+    # List db has businesses that refers to BusinessList/businesses db
+
+    ### Need Help with where / how to connect and assign attributes for each user here
+    def __init__(self, list_name, user_id_fk):
+        self.list_name = list_name
+        self.user_id_fk = user_id_fk
+
+    # def __repr__(self):
+    #    return f"User {username} has list {}." # confused here
+    #    self.business_id = #RETRIEVE from api
+    #    self.business_name = #Restrieve id from api then retrieve name
+    #    self.list_id = #Retrieve from lists db
+
+
+class BusinessList(db.Model):
+    __tablename__ = "businesses"
+    # Add id number of list, name of business, business_id columns
+    business_id = db.Column(db.String, primary_key=True)
+    business_name = db.Column(db.String())
+    # list_id = db.Column(db.Integer, db.ForeignKey("lists.list_id"))
+
+    ### Need Help with where / how to connect and assign attributes for each business here
+    def __init__(self, business_id, business_name):
+        self.business_id = business_id
+        self.business_name = business_name
+        # self.list_id = list_id
+
+    # def __repr__(self):
+    #    return f"User {username} has list {}." # confused here
+    #    self.business_id = #RETRIEVE from api
+    #    self.business_name = #Restrieve id from api then retrieve name
+    #    self.list_id = #Retrieve from lists db
+
+
+# class FriendModel(db.Model):
+#     ___tablename___ = "friends"
+
+#     user_id_fk = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+#     friend_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+
+load_dotenv()
+db.create_all()
+
+# add list id and business id to listscontents table
+def addRestaurantToList(listId, businessId):
+    # from .db import listscontents, db
+
+    # insert into listscontents table
+    statement = listscontents.insert().values(
+        list_id_fk=listId, business_id_fk=businessId
+    )
+    db.session.execute(statement)
+    db.session.commit()
+
+
+# gets a list of names of list
 def getListNames(userId):
-    from .db import Lists, db
+    listName = []
+    # from .db import Lists, db
+
     # get list names from user_id_fk
     listIds = db.session.query(Lists).filter_by(user_id_fk=1).all()
-    for listId in listIds:  
+    for listId in listIds:
         print(listId.list_name, flush=True)
+        listName.append(listId.list_name)
 
-## todo return friends
+    return listName
+
+
+# take listIds from Lists table db
+def getListIds():
+    listIds = []
+    # from .db import db, Lists
+
+    stmt = select([Lists.list_id])
+    results = db.session.execute(stmt).scalars()
+    for result in results:
+        listIds.append(result)
+
+    return listIds
+
+
+## return business ids based on list ids from listscontents
+def getBusinessId(list_id):
+    idList = []
+
+    # from .db import listscontents, db
+
+    # Read from listscontents table
+    ids = (
+        db.session.query(listscontents).filter_by(list_id_fk=list_id).all()
+    )  # list id parameter
+    for id in ids:
+        print(id.business_id_fk)
+        idList.append(id.business_id_fk)
+
+    return idList
+
+
+## return friends ids
 def getFriends(userId):
     from .db import friends, db
+
     # get names from friends table from user_id_fk
     userIds = db.session.query(friends).filter_by(user_id_fk=1).all()
-    for userId in userIds:  
+    for userId in userIds:
         print(userId.friend_id, flush=True)
+
 
 # creates a default liked list for every registered user
 def createLikedList(userId):
-    from .db import Lists, db
+    # from .db import Lists, db
     add_liked_list = Lists(list_name="Liked", user_id_fk=userId)
     db.session.add(add_liked_list)
     print(userId, flush=True)
     db.session.commit()
 
+
 def createList(userId, listName):
-    from .db import Lists, db
-    add_list = Lists(list_name=listName, user_id_fk=userId)
+    # from .db import Lists, db
+
+    add_list = Lists(list_name=listName, user_id_fk=int(userId))
+
     db.session.add(add_list)
     print(userId, listName, flush=True)
     db.session.commit()
@@ -94,6 +250,9 @@ def index():
     testLocation = "toronto"
     category = ""
     city = None
+
+    ## add dynamic user
+    listNames = getListNames(1)
 
     if request.method == "POST":
         city = request.form.get("city")
@@ -141,48 +300,56 @@ def index():
         title="StreetEats",
         url=os.getenv("URL"),
         data=business_data,
+        listName=listNames,
     )
 
     # if not logged in, do this
     # return render_template("userhomepage.html", title="StreetEats", url=os.getenv("URL"), data=business_data,)
 
-# add business names and ids to db
+
+business_id = ""
+
+
 @app.route("/like-business", methods=["POST"])
 def likeBusiness():
-    from .db import BusinessList, listscontents, db
+    global business_id
+    # business_id = request.form.get("business-id")
+
+    # from .db import BusinessList, db
+
     business_data = request.form.get("business-id").split(", ")
-    business_id = business_data[0].replace("'", '').replace(')', '').replace('(', '')
-    business_name = business_data[1].replace("'", '').replace(')', '').replace('(', '')
+    business_id = business_data[0].replace("'", "").replace(")", "").replace("(", "")
+    business_name = business_data[1].replace("'", "").replace(")", "").replace("(", "")
     # print(business_id, flush=True)
     # print(business_name, flush=True)
-    
+
     # insert into business table
     add_business = BusinessList(business_id=business_id, business_name=business_name)
     db.session.add(add_business)
     db.session.commit()
 
-    # insert into listscontents table
-    statement = listscontents.insert().values(list_id_fk=1, business_id_fk=business_id)
-    db.session.execute(statement)
-    db.session.commit()
-
-    # Read from listscontents table
-    ids = db.session.query(listscontents).filter_by(list_id_fk=1).all()
-    for id in ids:  
-        print(id.business_id_fk)
-    #### returns business ids from a list == 1 #####
-    # 4qyjRhjEgWGHPjgYWkBy8g
-    # rCevbj5Zovz1sNqaEMlSNA
-    # 1TCm5Z71hpPaAl0PXr6S6g
-    # glhCxpZ4OdUkXPp0jIqvPg
-    # pzg5nXrMocCzQIoTf57QJw
-
-    # ids = db.session.query(listscontents).filter_by(list_id_fk=1).all()
-    # print(ids)
-    #### returns an array of (list_id_fk, 'business_id_fk'), will need to extract ### 
-    # [(1, '4qyjRhjEgWGHPjgYWkBy8g'), (1, 'rCevbj5Zovz1sNqaEMlSNA'), (1, '1TCm5Z71hpPaAl0PXr6S6g')]
-
     return '{"id":"%s","success":true}' % business_id
+
+
+@app.route("/modal-like", methods=["POST"])
+def modalLike():
+    ## add dynamic user
+    listNames = getListNames(1)
+    listIds = getListIds()
+    listname = request.form.get("modal-liked")
+    # print(listname)
+
+    for entry in listNames:
+        if entry == listname:
+            index = listNames.index(entry)
+            list_id = listIds[index]
+    # print(list_id)
+
+    # print(listIds, flush=True)
+
+    addRestaurantToList(list_id, business_id)
+
+    return '{"id":"%s","success":true}' % listname
 
 
 @app.route("/restaurant/<name>", methods=["POST"])
@@ -215,24 +382,97 @@ def userhomepage():
     return render_template("userhomepage.html", title="Homepage", url=os.getenv("URL"))
 
 
-@app.route("/userpage")
+@app.route("/settings")
+def settings():
+    return render_template("settings.html", title="Settings", url=os.getenv("URL"))
+
+
+listNameArray = []
+
+
+@app.route("/userpage", methods=["POST", "GET"])
 def userpage():
-    return render_template("userpage.html", title="My Account", url=os.getenv("URL"))
+    global listNameArray
+
+    ## make dynamic for user logged in
+    listNameArray = getListNames(1)
+
+    return render_template(
+        "userpage.html", title="My Account", url=os.getenv("URL"), names=listNameArray
+    )
 
 
-@app.route("/listpage")
-def listpage():
-    return render_template("listpage.html", title="My List", url=os.getenv("URL"))
+@app.route("/create-newList", methods=["POST"])
+def createNewList():
+    newList_name = request.form.get("newList")
+    ## need to make dynamic for user
+    createList(1, newList_name)
+
+    return '{"id":"%s","success":true}' % newList_name
+
+
+@app.route("/list/<listName>", methods=["POST", "GET"])
+def listpage(listName):
+
+    # get list of ids from the List table
+    listIds = getListIds()
+
+    # loop to match listname and match to id
+    for entry in listNameArray:
+        if entry == listName:
+            index = listNameArray.index(entry)
+            list_id = listIds[index]
+
+    # print(list_id)
+
+    idList = getBusinessId(list_id)
+    # print(idList)
+
+    liked_businesses = []
+
+    for id in idList:
+        ENDPOINT_YELPB = yelpBusinessInfo(id)
+        responseB = requests.get(url=ENDPOINT_YELPB, headers=HEADERS_YELP)
+        businessData = responseB.json()
+
+        # extract data from businessData to append to liked_businesses
+        # price currently doesn't pull from API - check later
+
+        id1 = businessData["id"]
+        name = businessData["name"]
+        # price = businessData["price"]
+        rating = businessData["rating"]
+        phone = businessData["display_phone"]
+        address = businessData["location"]["address1"]
+
+        new_data = {
+            "id": id1,
+            "name": name,
+            # "price": price,
+            "rating": rating,
+            "phone": phone,
+            "address": address,
+        }
+
+        liked_businesses.append(new_data)
+
+    return render_template(
+        "listpage.html",
+        title="My List",
+        url=os.getenv("URL"),
+        data={"liked_businesses": liked_businesses},
+        name=listName,
+    )
 
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    # from .db import UserModel, db
+
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
         error = None
-
-        from .db import UserModel, db
 
         if not username:
             error = "Username is required."
@@ -257,12 +497,13 @@ def register():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    from .db import UserModel
 
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
         error = None
+        # from .db import UserModel
+
         user = UserModel.query.filter_by(username=username).first()
 
         if user is None:
@@ -296,4 +537,4 @@ def logout():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()

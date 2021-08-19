@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="content">
-<div class="row">
+  <div class="row">
     <div class="col-sm-8">
       <div class="card">
         <div class="card-body">
@@ -10,72 +10,110 @@
           <br>
           <br>
           <div class="row row-cols-1 row-cols-md-2 g-4">
+            {% for name in names%}
             <div class="col">
               <div class="card">
-                <img src="..." class="card-img-top" alt="...">
+                <img src="static/img/blue.jpg" class="card-img-top" alt="...">
                 <div class="card-body">
-                  <h5 class="card-title">List Title</h5>
-                  <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+
+                  <form action="{{ url_for('listpage' ,listName=name) }}" method="POST" class="list">
+                    <button class="look-like-link" type=submit>{{name}}</button>
+                    <!-- <button class="card-title" type=submit>
+                      <h5 class="card-title">{{name}}</h5>
+                    </button> -->
+                    <input type="hidden" name="list" value="{{name}}" />
+                  </form>
+
                 </div>
+
+                <div class="card-footer">
+                  <small class="text-muted">5 restuarants in list (code in later)</small>
+                </div>
+
               </div>
             </div>
-            <div class="col">
-              <div class="card">
-                <img src="..." class="card-img-top" alt="...">
-                <div class="card-body">
-                  <h5 class="card-title">List Title</h5>
-                  <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                </div>
-              </div>
-            </div>
-            <div class="col">
-              <div class="card">
-                <img src="..." class="card-img-top" alt="...">
-                <div class="card-body">
-                  <h5 class="card-title">List Title</h5>
-                  <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content.</p>
-                </div>
-              </div>
-            </div>
-            <div class="col">
-              <div class="card">
-                <img src="..." class="card-img-top" alt="...">
-                <div class="card-body">
-                  <h5 class="card-title">List Title</h5>
-                  <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                </div>
-              </div>
-            </div>
+            {% endfor %}
+
           </div>
           <br><br><br><br><br><br><br>
-          <button class="btn btn-primary" style="float: right;">Create a new list</button>
+
+          <button class="btn btn-primary" style="float: right;" data-bs-toggle="modal" data-bs-target="#exampleModal"
+            type='button'>Create a new list</button>
+
         </div>
       </div>
     </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Create new List</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <form action="/userpage" method="POST" class="createNewList">
+            <div class="modal-body">
+              <input type="text" placeholder="New List Name" name="newList" />
+
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Create List</button>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+
+
 
     <div class="col-sm-4">
-    <div class="extend">
-      <div class="card">
-        <div class="card-body">
-          <h3 class="card-title">Find your Friends!!!</h3>
-          <p class="card-text">Add your friends to see their restaurant lists!</p>
-          <form action="/" method="POST">
-            <div class="form-floating mb-3">
-                <input id ="type" name ="type" type="text" class="form-control" id="floatingInput" placeholder="Category">
+      <div class="extend">
+        <div class="card">
+          <div class="card-body">
+            <h3 class="card-title">Find your Friends!!!</h3>
+            <p class="card-text">Add your friends to see their restaurant lists!</p>
+            <form action="/userpage" method="POST">
+              <div class="form-floating mb-3">
+                <input id="type" name="type" type="text" class="form-control" id="floatingInput" placeholder="Category">
                 <label for="floatingInput">Username</label>
-            </div>
-            <button class="btn btn-primary" type="submit" id="submit" name="submit" value="search">Search</button>
-            
-            <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-          </form>
+              </div>
+              <button class="btn btn-primary" type="submit" id="submit" name="submit" value="search">Search</button>
+
+              <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+            </form>
+          </div>
         </div>
       </div>
     </div>
-    </div>
 
+  </div>
 </div>
-</div>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type=text/javascript>
 
+$(document).ready(function() {
+$('.createNewList').submit(function (e) {
+  e.preventDefault();
+ 
+  $.ajax({
+      url:"/create-newList",
+      type:"POST",
+      cache:false,
+      data:$(e.target).serialize(),
+      success: function (data) {
+          console.log(data);
+          window.location.reload();
+      }
+      });
+});
+});
+
+</script>
 
 {% endblock %}
