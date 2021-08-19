@@ -29,10 +29,22 @@ load_dotenv()
 app = Flask(__name__)
 
 
-lat, long = api_location()
 ENDPOINT_YELP, HEADERS_YELP = apiYelp()
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+
+def get_my_ip():
+
+    if request.environ.get("HTTP_X_FORWARDED_FOR") is None:
+        print(request.environ["REMOTE_ADDR"], flush=True)
+        ip = request.environ["REMOTE_ADDR"]
+        return ip
+    else:
+        print(request.environ["HTTP_X_FORWARDED_FOR"], flush=True)  # if behind a proxy
+        ip = request.environ["HTTP_X_FORWARDED_FOR"]
+
+        return ip
 
 
 @login_manager.user_loader
@@ -259,23 +271,12 @@ class user_category:
         return self.type
 
 
-@app.route("/get_my_ip", methods=["GET"])
-def get_my_ip():
-
-    if request.environ.get("HTTP_X_FORWARDED_FOR") is None:
-        print(request.environ["REMOTE_ADDR"], flush=True)
-    else:
-        print(request.environ["HTTP_X_FORWARDED_FOR"], flush=True)  # if behind a proxy
-
-    return (
-        jsonify({"ip": request.environ["HTTP_X_FORWARDED_FOR"]}),
-        200,
-    )
-
-
 # restaurants
 @app.route("/", methods=["GET", "POST"])
 def index():
+    ip = get_my_ip()
+    lat, long = api_location(ip)
+    print(ip, flush=True)
     testLocation = "toronto"
     category = ""
     city = None
@@ -437,10 +438,17 @@ def check():
 @app.route("/userhomepage", methods=["POST"])
 def userhomepage():
 
+    ip = get_my_ip()
+    lat, long = api_location(ip)
+
     if current_user.is_active:
         testLocation = "toronto"
         category = ""
         city = None
+
+        # check if it is already in the database
+        # if it is in , return it from db
+        # if not, add to database and return to user
 
         ## add dynamic user
         listNames = getListNames(1)
