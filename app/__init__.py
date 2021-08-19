@@ -575,28 +575,28 @@ def listpage(listName):
             # extract data from businessData to append to liked_businesses
             # price currently doesn't pull from API - check later
 
-        id1 = businessData["id"]
-        name = businessData["name"]
-        picture = businessData["image_url"]
-        # price = businessData["price"]
-        rating = businessData["rating"]
-        distance = businessData["distance"]
-        phone = businessData["display_phone"]
-        address = businessData["location"]["address1"]
+            id1 = businessData["id"]
+            name = businessData["name"]
+            picture = businessData["image_url"]
+            # price = businessData["price"]
+            rating = businessData["rating"]
+            distance = businessData["distance"]
+            phone = businessData["display_phone"]
+            address = businessData["location"]["address1"]
 
-        new_data = {
-            "id": id1,
-            "name": name,
-            "picture": picture,
-            # "distance": int(distance) / 1000,
-            "distance": distance,
-            # "price": price,
-            "rating": rating,
-            "phone": phone,
-            "address": address,
-        }
+            new_data = {
+                "id": id1,
+                "name": name,
+                "picture": picture,
+                # "distance": int(distance) / 1000,
+                "distance": distance,
+                # "price": price,
+                "rating": rating,
+                "phone": phone,
+                "address": address,
+            }
 
-        liked_businesses.append(new_data)
+            liked_businesses.append(new_data)
 
         return render_template(
             "listpage.html",
