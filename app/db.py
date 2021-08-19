@@ -2,6 +2,7 @@ from flask import Flask, g
 from flask import session
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
+
 # from flask_migrate import Migrate
 from . import app
 from flask_login import UserMixin
@@ -9,9 +10,14 @@ from flask_login import UserMixin
 db = SQLAlchemy(app)
 # migrate = Migrate(app, db)
 
-friends = db.Table('friends',
-    db.Column("user_id_fk", db.Integer, db.ForeignKey("users.user_id"), primary_key=True),
-    db.Column("friend_id_fk", db.Integer, db.ForeignKey("users.user_id"), primary_key=True)
+friends = db.Table(
+    "friends",
+    db.Column(
+        "user_id_fk", db.Integer, db.ForeignKey("users.user_id"), primary_key=True
+    ),
+    db.Column(
+        "friend_id_fk", db.Integer, db.ForeignKey("users.user_id"), primary_key=True
+    ),
 )
 
 # create user table
@@ -23,12 +29,13 @@ class UserModel(db.Model, UserMixin):
     password = db.Column(db.String())
     lists = db.relationship("Lists", backref="List_OwnerID")
 
-    #User has lists that refers to Lists db
-    friendship = db.relationship("UserModel",
-                    secondary=friends,
-                    primaryjoin=user_id==friends.c.user_id_fk,
-                    secondaryjoin=user_id==friends.c.friend_id_fk,
-                    backref="followed_by"
+    # User has lists that refers to Lists db
+    friendship = db.relationship(
+        "UserModel",
+        secondary=friends,
+        primaryjoin=user_id == friends.c.user_id_fk,
+        secondaryjoin=user_id == friends.c.friend_id_fk,
+        backref="followed_by",
     )
 
     def __init__(self, user_id, username, password):
@@ -37,11 +44,11 @@ class UserModel(db.Model, UserMixin):
         self.password = password
 
     def is_active(self):
-       return True
+        return True
 
     def is_active(self):
         return self.user_id
-    
+
     def is_authenticated(self):
         return self.authenticated
 
@@ -51,11 +58,13 @@ class UserModel(db.Model, UserMixin):
     def __repr__(self):
         return f"<User {self.username}>"
 
+
 listscontents = db.Table(
     "listscontents",
     db.Column("list_id_fk", db.Integer, db.ForeignKey("lists.list_id")),
     db.Column("business_id_fk", db.String, db.ForeignKey("businesses.business_id")),
 )
+
 
 class Lists(db.Model):
     __tablename__ = "lists"

@@ -16,7 +16,13 @@ from flask import session
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from flask_login import (
+    LoginManager,
+    login_user,
+    logout_user,
+    login_required,
+    current_user,
+)
 
 load_dotenv()
 
@@ -29,11 +35,10 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 
-
 @login_manager.user_loader
 def load_user(user_id):
     # from .db import UserModel
-# since the user_id is just the primary key of our user table, use it in the query for the user
+    # since the user_id is just the primary key of our user table, use it in the query for the user
     return UserModel.query.filter_by(user_id=int(user_id)).first()
 
 
@@ -49,9 +54,9 @@ app.config[
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
-app.config['SESSION_TYPE'] = 'filesystem' 
-app.config['SESSION_PERMANENT']= False
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+app.config["SESSION_TYPE"] = "filesystem"
+app.config["SESSION_PERMANENT"] = False
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
@@ -89,11 +94,11 @@ class UserModel(db.Model):
         self.password = password
 
     def is_active(self):
-       return True
+        return True
 
     def is_active(self):
         return self.user_id
-    
+
     def is_authenticated(self):
         return self.authenticated
 
@@ -155,6 +160,7 @@ class BusinessList(db.Model):
     #    self.business_id = #RETRIEVE from api
     #    self.business_name = #Restrieve id from api then retrieve name
     #    self.list_id = #Retrieve from lists db
+
 
 load_dotenv()
 db.create_all()
@@ -243,6 +249,7 @@ def createList(userId, listName):
     print(userId, listName, flush=True)
     db.session.commit()
 
+
 class user_category:
     def __init__(self, type, location):
         self.type = type
@@ -251,6 +258,7 @@ class user_category:
     def repr(self):
         return self.type
 
+
 # restaurants
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -258,13 +266,12 @@ def index():
     category = ""
     city = None
 
-    if(current_user.is_active):
+    if current_user.is_active:
         print(f"The current user logged in: {current_user.user_id}", flush=True)
         ## add dynamic user
         listNames = getListNames(current_user.user_id)
     else:
         print("No active user", flush=True)
-
 
     if request.method == "POST":
         city = request.form.get("city")
@@ -307,7 +314,7 @@ def index():
     # print(business_data)
 
     # if logged in, do this (figure out user session)
-    if(current_user.is_active):
+    if current_user.is_active:
         return render_template(
             "userhomepage.html",
             title="StreetEats",
@@ -317,11 +324,17 @@ def index():
         )
     else:
 
-    # if not logged in, do this
-        return render_template("index.html", title="StreetEats", url=os.getenv("URL"), data=business_data,)
+        # if not logged in, do this
+        return render_template(
+            "index.html",
+            title="StreetEats",
+            url=os.getenv("URL"),
+            data=business_data,
+        )
 
 
 business_id = ""
+
 
 @login_required
 @app.route("/like-business", methods=["POST"])
@@ -343,6 +356,7 @@ def likeBusiness():
     db.session.commit()
 
     return '{"id":"%s","success":true}' % business_id
+
 
 @login_required
 @app.route("/modal-like", methods=["POST"])
@@ -390,10 +404,12 @@ def restaurant(name):
 def check():
     return "Working"
 
+
 @login_required
 @app.route("/userhomepage")
 def userhomepage():
     return render_template("userhomepage.html", title="Homepage", url=os.getenv("URL"))
+
 
 @login_required
 @app.route("/settings")
@@ -402,6 +418,7 @@ def settings():
 
 
 listNameArray = []
+
 
 @login_required
 @app.route("/userpage", methods=["POST", "GET"])
@@ -415,6 +432,7 @@ def userpage():
         "userpage.html", title="My Account", url=os.getenv("URL"), names=listNameArray
     )
 
+
 @login_required
 @app.route("/create-newList", methods=["POST"])
 def createNewList():
@@ -423,6 +441,7 @@ def createNewList():
     createList(1, newList_name)
 
     return '{"id":"%s","success":true}' % newList_name
+
 
 @login_required
 @app.route("/list/<listName>", methods=["POST", "GET"])
@@ -543,6 +562,7 @@ def login():
 
     # Return a login page
     return render_template("login.html")
+
 
 @login_required
 @app.route("/logout", methods=["POST"])
