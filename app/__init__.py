@@ -353,45 +353,54 @@ business_id = ""
 @login_required
 @app.route("/like-business", methods=["POST"])
 def likeBusiness():
-    global business_id
-    # business_id = request.form.get("business-id")
+    if current_user.is_active:
+        global business_id
+        # business_id = request.form.get("business-id")
 
-    # from .db import BusinessList, db
+        # from .db import BusinessList, db
 
-    business_data = request.form.get("business-id").split(", ")
-    business_id = business_data[0].replace("'", "").replace(")", "").replace("(", "")
-    business_name = business_data[1].replace("'", "").replace(")", "").replace("(", "")
-    # print(business_id, flush=True)
-    # print(business_name, flush=True)
+        business_data = request.form.get("business-id").split(", ")
+        business_id = business_data[0].replace("'", "").replace(")", "").replace("(", "")
+        business_name = business_data[1].replace("'", "").replace(")", "").replace("(", "")
+        # print(business_id, flush=True)
+        # print(business_name, flush=True)
 
-    # insert into business table
-    add_business = BusinessList(business_id=business_id, business_name=business_name)
-    db.session.add(add_business)
-    db.session.commit()
+        # insert into business table
+        add_business = BusinessList(business_id=business_id, business_name=business_name)
+        db.session.add(add_business)
+        db.session.commit()
 
-    return '{"id":"%s","success":true}' % business_id
+        return '{"id":"%s","success":true}' % business_id
+    else:
+        print("No active user, redirect to login", flush=True)
+        return redirect(url_for("login"), code=302)
 
 
 @login_required
 @app.route("/modal-like", methods=["POST"])
 def modalLike():
-    ## add dynamic user
-    listNames = getListNames(current_user.user_id)
-    listIds = getListIds(current_user.user_id)
-    listname = request.form.get("modal-liked")
-    # print(listname)
+    if current_user.is_active:
+        ## add dynamic user
+        listNames = getListNames(current_user.user_id)
+        listIds = getListIds(current_user.user_id)
+        listname = request.form.get("modal-liked")
+        # print(listname)
 
-    for entry in listNames:
-        if entry == listname:
-            index = listNames.index(entry)
-            list_id = listIds[index]
-    # print(list_id)
+        for entry in listNames:
+            if entry == listname:
+                index = listNames.index(entry)
+                list_id = listIds[index]
+        # print(list_id)
 
-    # print(listIds, flush=True)
+        # print(listIds, flush=True)
 
-    addRestaurantToList(list_id, business_id)
+        addRestaurantToList(list_id, business_id)
 
-    return '{"id":"%s","success":true}' % listname
+        return '{"id":"%s","success":true}' % listname
+
+    else:
+        print("No active user, redirect to login", flush=True)
+        return redirect(url_for("login"), code=302)
 
 
 @app.route("/restaurant/<name>", methods=["POST"])
@@ -422,68 +431,77 @@ def check():
 @app.route("/userhomepage", methods=["POST"])
 def userhomepage():
 
-    testLocation = "toronto"
-    category = ""
-    city = None
+    if current_user.is_active:
+        testLocation = "toronto"
+        category = ""
+        city = None
 
-    ## add dynamic user
-    listNames = getListNames(1)
+        ## add dynamic user
+        listNames = getListNames(1)
 
-    if request.method == "POST":
-        city = request.form.get("city")
-        selection = request.form.get("type")
-        S = user_category(selection, testLocation)
-        category = S.repr()
+        if request.method == "POST":
+            city = request.form.get("city")
+            selection = request.form.get("type")
+            S = user_category(selection, testLocation)
+            category = S.repr()
 
-    if city:
-        PARAMETERS_YELP = {
-            "term": category,
-            "limit": 50,
-            "offset": 50,
-            "radius": 10000,
-            "location": city,
-        }
+        if city:
+            PARAMETERS_YELP = {
+                "term": category,
+                "limit": 50,
+                "offset": 50,
+                "radius": 10000,
+                "location": city,
+            }
+        else:
+            PARAMETERS_YELP = {
+                "term": category,
+                "limit": 50,
+                "offset": 50,
+                "radius": 10000,
+                "latitude": lat,
+                "longitude": long,
+            }
+
+        # check if it is already in the database
+        # if it is in , return it from db
+        # if not, add to database and return to user
+
+        response = requests.get(
+            url=ENDPOINT_YELP, params=PARAMETERS_YELP, headers=HEADERS_YELP
+        )
+        business_data = response.json()
+
+        # choose list
+        # is business id already in db-list?
+        # if it is, do nothing
+        # if not, add to database
+
+        # print(business_data)
+
+        # if logged in, do this (figure out user session)
+
+        return render_template(
+            "userhomepage.html",
+            title="Homepage",
+            url=os.getenv("URL"),
+            data=business_data,
+            listName=listNames,
+        )
     else:
-        PARAMETERS_YELP = {
-            "term": category,
-            "limit": 50,
-            "offset": 50,
-            "radius": 10000,
-            "latitude": lat,
-            "longitude": long,
-        }
-
-    # check if it is already in the database
-    # if it is in , return it from db
-    # if not, add to database and return to user
-
-    response = requests.get(
-        url=ENDPOINT_YELP, params=PARAMETERS_YELP, headers=HEADERS_YELP
-    )
-    business_data = response.json()
-
-    # choose list
-    # is business id already in db-list?
-    # if it is, do nothing
-    # if not, add to database
-
-    # print(business_data)
-
-    # if logged in, do this (figure out user session)
-
-    return render_template(
-        "userhomepage.html",
-        title="Homepage",
-        url=os.getenv("URL"),
-        data=business_data,
-        listName=listNames,
-    )
+        print("No active user, redirect to login", flush=True)
+        return redirect(url_for("login"), code=302)
 
 
 @login_required
 @app.route("/settings")
 def settings():
-    return render_template("settings.html", title="Settings", url=os.getenv("URL"))
+    if current_user.is_active:
+        return render_template("settings.html", title="Settings", url=os.getenv("URL"))
+    else:
+        print("No active user, redirect to login", flush=True)
+        return redirect(url_for("login"), code=302)
+    
 
 
 listNameArray = []
@@ -494,51 +512,61 @@ listNameArray = []
 def userpage():
     global listNameArray
 
-    ## make dynamic for user logged in
-    listNameArray = getListNames(current_user.user_id)
+    if current_user.is_active:
+        ## make dynamic for user logged in
+        listNameArray = getListNames(current_user.user_id)
 
-    return render_template(
+        return render_template(
         "userpage.html", title="My Account", url=os.getenv("URL"), names=listNameArray
     )
+    else:
+        print("No active user, redirect to login", flush=True)
+        return redirect(url_for("login"), code=302)
 
 
 @login_required
 @app.route("/create-newList", methods=["POST"])
 def createNewList():
-    newList_name = request.form.get("newList")
-    ## need to make dynamic for user
-    createList(current_user.user_id, newList_name)
+    if current_user.is_active:
+        newList_name = request.form.get("newList")
+        ## need to make dynamic for user
+        createList(current_user.user_id, newList_name)
 
-    return '{"id":"%s","success":true}' % newList_name
+        return '{"id":"%s","success":true}' % newList_name
+    else:
+        print("No active user, redirect to login", flush=True)
+        return redirect(url_for("login"), code=302)
+
 
 
 @login_required
 @app.route("/list/<listName>", methods=["POST", "GET"])
 def listpage(listName):
+    if current_user.is_active:
 
-    # get list of ids from the List table
-    listIds = getListIds(current_user.user_id)
+        # get list of ids from the List table
+        listIds = getListIds(current_user.user_id)
 
-    # loop to match listname and match to id
-    for entry in listNameArray:
-        if entry == listName:
-            index = listNameArray.index(entry)
-            list_id = listIds[index]
+        # loop to match listname and match to id
+        for entry in listNameArray:
+            if entry == listName:
+                index = listNameArray.index(entry)
+                list_id = listIds[index]
 
-    # print(list_id)
+        # print(list_id)
 
-    idList = getBusinessId(list_id)
-    # print(idList)
+        idList = getBusinessId(list_id)
+        # print(idList)
 
-    liked_businesses = []
+        liked_businesses = []
 
-    for id in idList:
-        ENDPOINT_YELPB = yelpBusinessInfo(id)
-        responseB = requests.get(url=ENDPOINT_YELPB, headers=HEADERS_YELP)
-        businessData = responseB.json()
+        for id in idList:
+            ENDPOINT_YELPB = yelpBusinessInfo(id)
+            responseB = requests.get(url=ENDPOINT_YELPB, headers=HEADERS_YELP)
+            businessData = responseB.json()
 
-        # extract data from businessData to append to liked_businesses
-        # price currently doesn't pull from API - check later
+            # extract data from businessData to append to liked_businesses
+            # price currently doesn't pull from API - check later
 
         id1 = businessData["id"]
         name = businessData["name"]
@@ -562,13 +590,17 @@ def listpage(listName):
 
         liked_businesses.append(new_data)
 
-    return render_template(
-        "listpage.html",
-        title="My List",
-        url=os.getenv("URL"),
-        data={"liked_businesses": liked_businesses},
-        name=listName,
-    )
+        return render_template(
+            "listpage.html",
+            title="My List",
+            url=os.getenv("URL"),
+            data={"liked_businesses": liked_businesses},
+            name=listName,
+        )    
+    else:
+        print("No active user, redirect to login", flush=True)
+        return redirect(url_for("login"), code=302)
+    
 
 
 @app.route("/register", methods=["GET", "POST"])
