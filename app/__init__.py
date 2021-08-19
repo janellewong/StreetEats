@@ -545,7 +545,7 @@ def listpage(listName):
         picture = businessData["image_url"]
         # price = businessData["price"]
         rating = businessData["rating"]
-        distance = businessData["distance"]  
+        distance = businessData["distance"]
         phone = businessData["display_phone"]
         address = businessData["location"]["address1"]
 
@@ -553,7 +553,7 @@ def listpage(listName):
             "id": id1,
             "name": name,
             "picture": picture,
-            "distance": int(distance)/1000,
+            "distance": int(distance) / 1000,
             # "price": price,
             "rating": rating,
             "phone": phone,
