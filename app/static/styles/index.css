@@ -85,11 +85,11 @@ html {
 }
 
 .paddingl {
-    padding-top: 1vh;
-    padding-right: 15vw;
-    padding-left: 15vw;
-    background-color: #dff9fb;
-    height: 100vh;
+    padding-top: 1vh!important;
+    padding-right: 15vw!important;
+    padding-left: 15vw!important;
+    background-color: #dff9fb!important;
+    height: 100vh!important;
 
 }
 
