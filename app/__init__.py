@@ -542,14 +542,18 @@ def listpage(listName):
 
         id1 = businessData["id"]
         name = businessData["name"]
+        picture = businessData["image_url"]
         # price = businessData["price"]
         rating = businessData["rating"]
+        distance = businessData["distance"]  
         phone = businessData["display_phone"]
         address = businessData["location"]["address1"]
 
         new_data = {
             "id": id1,
             "name": name,
+            "picture": picture,
+            "distance": int(distance)/1000,
             # "price": price,
             "rating": rating,
             "phone": phone,

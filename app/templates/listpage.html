@@ -11,7 +11,7 @@
   <div class="card mb-3" style="max-width: 1050px;" style="max-height: 50%;">
     <div class="row g-0">
       <div class="col-md-4">
-        <img src="{{entry['image_url']}}" class="img-fluid rounded-start" alt="...">
+        <img src="{{entry['picture']}}" class="img-fluid rounded-start" alt="...">
       </div>
       <div class="col-md-8">
         <div class="card-body">
@@ -22,9 +22,8 @@
 
           <p class="card-text">
             <strong>Rating: </strong>{{entry['rating']}}
-            <br> <strong>Price: </strong>{{entry['price']}}
-            <br> <strong>Phone: </strong>{{entry['display_phone']}}
-            <br> <strong>Address: </strong>{{entry['address']['address1']}}
+            <br> <strong>Phone: </strong>{{entry['phone']}}
+            <br> <strong>Address: </strong>{{entry['address']}}
           
           <!-- <form action='/' method="POST" class="like-form">
             <div style="text-align:right">
@@ -37,7 +36,7 @@
 
         </div>
         <div class="card-footer">
-          <small class="text-muted">Distance from you: {{entry['distance']}} metres</small>
+          <small class="text-muted">Distance from you: {{entry['distance']}} km</small>
         </div>
       </div>
     </div>
