@@ -4,6 +4,7 @@
 
 <div class="listpage">
   <h1>{{name}}</h1>
+
   <br>
 
   {% for entry in data['liked_businesses'] %}
@@ -25,14 +26,15 @@
             <br> <strong>Phone: </strong>{{entry['phone']}}
             <br> <strong>Address: </strong>{{entry['address']}}
           
-          <!-- <form action='/' method="POST" class="like-form">
+          <!-- remove from list button here -->
+          <form action='/listpage' method="POST" class="like-form">
             <div style="text-align:right">
                 <input type="hidden" name="business-id" value="{{entry['id'], entry['name']}}" />
                 <button class="btn btn-primary" data-bs-toggle="modal"
                     data-bs-target="#exampleModal" type="submit" name="like" id="like"
                     value="like">Remove from list</button>
             </div>
-          </form> -->
+          </form>
 
         </div>
         <div class="card-footer">
@@ -41,6 +43,18 @@
       </div>
     </div>
   </div>
+
+  <br>
+
+  <!-- delete list button here -->
+  <form action='/listpage' method="POST" class="like-form">
+    <div style="text-align:right">
+        <input type="hidden" name="business-id" />
+        <button class="btn btn-primary" data-bs-toggle="modal"
+            data-bs-target="#exampleModal" type="submit" name="like" id="like"
+            value="like">Delete list</button>
+    </div>
+  </form>
 
   {% endfor %}
 
