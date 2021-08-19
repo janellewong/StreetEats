@@ -131,17 +131,9 @@
                                 {{entry['location']['city']}}, {{entry['location']['state']}}
                                 {{entry['location']['zip_code']}}, {{entry['location']['country']}}
 
-                            <form action='/' method="POST" class="like-form">
-                                <div style="text-align:right">
-                                    <!-- Like Count: <span class="like-count">1</span> -->
-                                    <input type="hidden" name="business-id" value="{{entry['id'], entry['name']}}" />
-                                    <button class="btn btn-primary" data-bs-toggle="modal"
-                                        data-bs-target="#exampleModal" type="submit" name="like" id="like"
-                                        value="like">Add to list</button>
-                                </div>
-                            </form>
 
-                            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+
+                            <p class="card-text"><small class="text-muted">Last updated 5 mins ago</small></p>
                         </div>
                         <div class="card-footer">
                             <small class="text-muted">Distance from you: {{entry['distance']}} metres</small>
@@ -204,37 +196,6 @@
                     var cleanedData = data.split('<!--SEARCH_RESULTS_START-->')[1].split('<!--SEARCH_RESULTS_END-->')[0]
                     $('#search-results').html(cleanedData);
 
-                    $('.like-form').submit(function (e) {
-                            e.preventDefault();
-                           
-                            $.ajax({
-                                url:"/like-business",
-                                type:"POST",
-                                cache:false,
-                                data:$(e.target).serialize(),
-                                success: function (data) {
-                                    console.log(data);
-                                    var likeCountSpan = $(e.target).find('.like-count')[0]
-                                    var newLikeCount = Number(likeCountSpan.innerText) + 1
-                                    likeCountSpan.innerText = `${newLikeCount}`
-                                }
-                                });
-                        });
-
-                        $('.modal-liked').submit(function (e) {
-                             e.preventDefault();
-           
-                            $.ajax({
-                                url:"/modal-like",
-                                type:"POST",
-                                cache:false,
-                                data:$(e.target).serialize(),
-                                success: function (data) {
-                                    console.log(data);
-                                
-                                }
-                                });
-                        });
 
                     jQuery('html, body').animate({
                         scrollTop: jQuery("#search-results").offset().top
