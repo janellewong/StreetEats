@@ -28,14 +28,14 @@
             {{entry['location']['city']}}, {{entry['location']['state']}}
             {{entry['location']['zip_code']}}, {{entry['location']['country']}}
           
-          <form action='/' method="POST" class="like-form">
+          <!-- <form action='/' method="POST" class="like-form"> -->
             <div style="text-align:right">
                 <input type="hidden" name="business-id" value="{{entry['id'], entry['name']}}" />
                 <button class="btn btn-primary" data-bs-toggle="modal"
                     data-bs-target="#exampleModal" type="submit" name="like" id="like"
                     value="like">Remove from list</button>
             </div>
-          </form>
+          <!-- </form> -->
 
         </div>
         <div class="card-footer">
