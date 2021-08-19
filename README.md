@@ -1,7 +1,7 @@
 # StreetEats
 
 ### What is it?
-StreetEats is a website that allows users to access local restaurants based on their location. Users can register, login, connect with their friends by username, and customze lists of restaurants. Lists of restaurants are unique to each user to customize a title for their list and add restaurants to each of their lists. 
+StreetEats is a website that allows users to access local restaurants based on their location. Users can register, login, connect with their friends by username, and customize lists of restaurants. Lists of restaurants are unique to each user to customize a title for their list and add restaurants to each of their lists. 
 
 ### Technologies Featured
 - NginX as a reverse proxy
