@@ -8,7 +8,6 @@
         <div class="card-body">
           <h3 class="card-title">Your Restaurant Lists</h3>
           <br>
-          <br>
           <div class="row row-cols-1 row-cols-md-2 g-4">
             {% for name in names%}
             <div class="col">
@@ -18,10 +17,18 @@
 
                   <form action="{{ url_for('listpage' ,listName=name) }}" method="POST" class="list">
                     <button class="look-like-link" type=submit>{{name}}</button>
-                    <!-- <button class="card-title" type=submit>
-                      <h5 class="card-title">{{name}}</h5>
-                    </button> -->
                     <input type="hidden" name="list" value="{{name}}" />
+                  </form>
+
+                  <br>
+
+                  <form action='/' method="POST" class="like-form">
+                    <div style="text-align:right">
+                        <input type="hidden" name="business-id" value="{{entry['id'], entry['name']}}" />
+                        <button class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#exampleModal" type="submit" name="like" id="like"
+                            value="like">Remove list</button>
+                    </div>
                   </form>
 
                 </div>
@@ -35,7 +42,7 @@
             {% endfor %}
 
           </div>
-          <br><br><br><br><br><br><br>
+          <br><br><br><br>
 
           <button class="btn btn-primary" style="float: right;" data-bs-toggle="modal" data-bs-target="#exampleModal"
             type='button'>Create a new list</button>
@@ -69,9 +76,7 @@
     </div>
 
 
-
-
-    <div class="col-sm-4">
+    <!-- <div class="col-sm-4">
       <div class="extend">
         <div class="card">
           <div class="card-body">
@@ -89,7 +94,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
 
   </div>
 </div>

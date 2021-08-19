@@ -11,20 +11,35 @@
   <div class="card mb-3" style="max-width: 1050px;" style="max-height: 50%;">
     <div class="row g-0">
       <div class="col-md-4">
-        <img src="..." class="img-fluid rounded-start" alt="...">
+        <img src="{{entry['image_url']}}" class="img-fluid rounded-start" alt="...">
       </div>
       <div class="col-md-8">
         <div class="card-body">
-          <h5 class="card-title">{{entry['name']}}</h5>
-          <p class="card-text">
-          <p><strong>Price: </strong> {{entry['price']}}</p>
-          <p><strong>Rating: </strong> {{entry['rating']}}</p>
-          <p><strong>Phone: </strong>{{entry['display_phone']}}</p>
+          <form action="{{ url_for('restaurant' ,name=entry['name']) }}" method="POST" class="id" target="_blank">
+            <button class="look-like-link" type=submit>{{entry['name']}}</button>
+            <input type="hidden" name="id" value="{{entry['id']}}" />
+          </form>
 
-          <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+          <p class="card-text">
+            <strong>Rating: </strong>{{entry['rating']}}
+            <br> <strong>Price: </strong>{{entry['price']}}
+            <br> <strong>Phone: </strong>{{entry['display_phone']}}
+            <br> <strong>Address: </strong>{{entry['location']['address1']}},
+            {{entry['location']['city']}}, {{entry['location']['state']}}
+            {{entry['location']['zip_code']}}, {{entry['location']['country']}}
+          
+          <form action='/' method="POST" class="like-form">
+            <div style="text-align:right">
+                <input type="hidden" name="business-id" value="{{entry['id'], entry['name']}}" />
+                <button class="btn btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#exampleModal" type="submit" name="like" id="like"
+                    value="like">Remove from list</button>
+            </div>
+          </form>
+
         </div>
         <div class="card-footer">
-          <small class="text-muted">poooop</small>
+          <small class="text-muted">Distance from you: {{entry['distance']}} metres</small>
         </div>
       </div>
     </div>
