@@ -101,7 +101,7 @@ $('.createNewList').submit(function (e) {
       data:$(e.target).serialize(),
       success: function (data) {
           console.log(data);
-         
+          window.location.reload();
       }
       });
 });
