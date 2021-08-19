@@ -12,14 +12,14 @@
         <div>
             <p style="text-align:center">Search restaurants in a location you want or near your current location!
                 <br>
-                <br>
+                Create lists on your account and save your favourite restaurants to your lists! <br>
             </p>
             <br>
             <br>
         </div>
 
         <div class="paddingl">
-            <form action="/userhomepage" method="POST" class="search-form">
+            <form action="/" method="POST" class="search-form">
                 <div class="form-floating mb-3">
                     <input id="type" name="type" type="text" class="form-control" id="floatingInput"
                         placeholder="Category">
@@ -27,11 +27,14 @@
                 </div>
 
                 <div class="form-floating mb-3">
-                    <input id="city" name="city" type="text" class="form-control" id="floatingInput" placeholder="City">
+                    <input id="city" name="city" type="text" class="form-control" id="floatingInput"
+                        placeholder="City">
                     <label for="floatingInput">Location (City)</label>
                 </div>
-                <button class="btn btn-primary" type="submit" id="submit" name="submit" value="search">Search</button>
-
+                <p>** Leave the location blank if you want to search restaurants near you</p>
+                <br>
+                <button class="btn btn-primary" type="submit" id="submit" name="submit"
+                    value="search">Search</button>
 
                 <br><br>
             </form>
