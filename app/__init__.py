@@ -377,7 +377,7 @@ def likeBusiness():
 def modalLike():
     ## add dynamic user
     listNames = getListNames(current_user.user_id)
-    listIds = getListIds()
+    listIds = getListIds(current_user.user_id)
     listname = request.form.get("modal-liked")
     # print(listname)
 
