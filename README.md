@@ -1,15 +1,15 @@
 # StreetEats
 
 ### What is it?
-StreetEats is a website that allows users to access local restaurants based on their location. Users can register, login, connect with their friends by username, and customze lists of restaurants. Lists of restaurants are unique to each user to customize a title for their list and add restaurants to each of their lists. 
+StreetEats is a website that allows users to access local restaurants based on their location. Users can register, login, connect with their friends by username, and customize lists of restaurants. Lists of restaurants are unique to each user to customize a title for their list and add restaurants to each of their lists. 
 
 ### Technologies Featured
 - NginX as a reverse proxy
 - Docker as a containerising service
-- HTML and CSS for design of pagea
+- HTML and CSS for design of pages
 - Flask and Python
 - PostgreSQL Databases
-- (3) APIs: YelpFusion API, IP address API, IP to coordinate API
+- (3) APIs: YelpFusion API, IP address API, IP to coordinates API
 
 ### Main Features and Implementation
 #### Registration and Login
@@ -23,7 +23,7 @@ Users are able to create new lists of restaurants to connect to their user profi
 
 
 ### Challenges and Solutions
-Understanding how to connect our 3 APIs and our multiple databases was a challenge. We decided to divide API and database related tasks to assign to each team member. We had to stay organized and in communication to piece together our 3 APIs and our databases. We researched postgreSQL and API get/post requests in our asigned sections.
+Understanding how to connect our 3 APIs and our multiple databases was a challenge. We decided to divide API and database related tasks to assign to each team member. We had to stay organized and in communication to piece together our 3 APIs and our databases. We researched postgreSQL and API get/post requests in our asigned sections, and asked for help as needed.
 
 ### License
 [MIT License](https://github.com/janellewong/StreetEats/blob/main/LICENSE)
