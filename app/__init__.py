@@ -438,7 +438,7 @@ def userpage():
 def createNewList():
     newList_name = request.form.get("newList")
     ## need to make dynamic for user
-    createList(1, newList_name)
+    createList(current_user.user_id, newList_name)
 
     return '{"id":"%s","success":true}' % newList_name
 
@@ -556,7 +556,7 @@ def login():
             print(current_user.user_id, flush=True)
             # return redirect(url_for('main.profile'))
             # return index()
-            return redirect("/userpage")
+            return redirect(url_for('userpage'), code=302)
         else:
             return error, 418
 
