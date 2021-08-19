@@ -13,19 +13,23 @@
             {% for name in names%}
             <div class="col">
               <div class="card">
-                <img src="..." class="card-img-top" alt="...">
+                <img src="static/img/blue.jpg" class="card-img-top" alt="...">
                 <div class="card-body">
 
                   <form action="{{ url_for('listpage' ,listName=name) }}" method="POST" class="list">
-                    <button class="card-title" type=submit>
+                    <button class="look-like-link" type=submit>{{name}}</button>
+                    <!-- <button class="card-title" type=submit>
                       <h5 class="card-title">{{name}}</h5>
-                    </button>
+                    </button> -->
                     <input type="hidden" name="list" value="{{name}}" />
                   </form>
 
-                  <p class="card-text">This is a longer card with supporting text below as a natural lead-in to
-                    additional content. This content is a little bit longer.</p>
                 </div>
+
+                <div class="card-footer">
+                  <small class="text-muted">5 restuarants in list (code in later)</small>
+                </div>
+
               </div>
             </div>
             {% endfor %}
@@ -63,6 +67,9 @@
         </div>
       </div>
     </div>
+
+
+
 
     <div class="col-sm-4">
       <div class="extend">
