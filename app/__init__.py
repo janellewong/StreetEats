@@ -3,6 +3,7 @@ from flask import Flask, render_template, request
 from dotenv import load_dotenv
 import requests
 from flask import request, redirect, url_for
+from sqlalchemy.sql.expression import true
 from app.api import api_location
 from app.api import apiYelp
 from app.api import yelpReviews
@@ -31,7 +32,7 @@ login_manager.init_app(app)
 
 @login_manager.user_loader
 def load_user(user_id):
-    from .db import UserModel
+    # from .db import UserModel
 # since the user_id is just the primary key of our user table, use it in the query for the user
     return UserModel.query.filter_by(user_id=int(user_id)).first()
 
@@ -83,8 +84,21 @@ class UserModel(db.Model):
     )
 
     def __init__(self, username, password):
+        # self.user_id = user_id
         self.username = username
         self.password = password
+
+    def is_active(self):
+       return True
+
+    def is_active(self):
+        return self.user_id
+    
+    def is_authenticated(self):
+        return self.authenticated
+
+    def get_id(self):
+        return int(self.user_id)
 
     def __repr__(self):
         return f"<User {self.username}>"
@@ -142,13 +156,6 @@ class BusinessList(db.Model):
     #    self.business_name = #Restrieve id from api then retrieve name
     #    self.list_id = #Retrieve from lists db
 
-
-# class FriendModel(db.Model):
-#     ___tablename___ = "friends"
-
-#     user_id_fk = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-#     friend_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-
 load_dotenv()
 db.create_all()
 
@@ -170,7 +177,7 @@ def getListNames(userId):
     # from .db import Lists, db
 
     # get list names from user_id_fk
-    listIds = db.session.query(Lists).filter_by(user_id_fk=1).all()
+    listIds = db.session.query(Lists).filter_by(user_id_fk=current_user.user_id).all()
     for listId in listIds:
         print(listId.list_name, flush=True)
         listName.append(listId.list_name)
@@ -179,11 +186,11 @@ def getListNames(userId):
 
 
 # take listIds from Lists table db
-def getListIds():
+def getListIds(userId):
     listIds = []
     # from .db import db, Lists
 
-    stmt = select([Lists.list_id])
+    stmt = select([Lists.list_id]).where(Lists.user_id_fk == userId)
     results = db.session.execute(stmt).scalars()
     for result in results:
         listIds.append(result)
@@ -210,7 +217,7 @@ def getBusinessId(list_id):
 
 ## return friends ids
 def getFriends(userId):
-    from .db import friends, db
+    # from .db import friends, db
 
     # get names from friends table from user_id_fk
     userIds = db.session.query(friends).filter_by(user_id_fk=1).all()
@@ -251,8 +258,13 @@ def index():
     category = ""
     city = None
 
-    ## add dynamic user
-    listNames = getListNames(1)
+    if(current_user.is_active):
+        print(f"The current user logged in: {current_user.user_id}", flush=True)
+        ## add dynamic user
+        listNames = getListNames(current_user.user_id)
+    else:
+        print("No active user", flush=True)
+
 
     if request.method == "POST":
         city = request.form.get("city")
@@ -295,21 +307,23 @@ def index():
     # print(business_data)
 
     # if logged in, do this (figure out user session)
-    return render_template(
-        "index.html",
-        title="StreetEats",
-        url=os.getenv("URL"),
-        data=business_data,
-        listName=listNames,
-    )
+    if(current_user.is_active):
+        return render_template(
+            "userhomepage.html",
+            title="StreetEats",
+            url=os.getenv("URL"),
+            data=business_data,
+            listName=listNames,
+        )
+    else:
 
     # if not logged in, do this
-    # return render_template("userhomepage.html", title="StreetEats", url=os.getenv("URL"), data=business_data,)
+        return render_template("index.html", title="StreetEats", url=os.getenv("URL"), data=business_data,)
 
 
 business_id = ""
 
-
+@login_required
 @app.route("/like-business", methods=["POST"])
 def likeBusiness():
     global business_id
@@ -330,11 +344,11 @@ def likeBusiness():
 
     return '{"id":"%s","success":true}' % business_id
 
-
+@login_required
 @app.route("/modal-like", methods=["POST"])
 def modalLike():
     ## add dynamic user
-    listNames = getListNames(1)
+    listNames = getListNames(current_user.user_id)
     listIds = getListIds()
     listname = request.form.get("modal-liked")
     # print(listname)
@@ -376,12 +390,12 @@ def restaurant(name):
 def check():
     return "Working"
 
-
+@login_required
 @app.route("/userhomepage")
 def userhomepage():
     return render_template("userhomepage.html", title="Homepage", url=os.getenv("URL"))
 
-
+@login_required
 @app.route("/settings")
 def settings():
     return render_template("settings.html", title="Settings", url=os.getenv("URL"))
@@ -389,19 +403,19 @@ def settings():
 
 listNameArray = []
 
-
+@login_required
 @app.route("/userpage", methods=["POST", "GET"])
 def userpage():
     global listNameArray
 
     ## make dynamic for user logged in
-    listNameArray = getListNames(1)
+    listNameArray = getListNames(current_user.user_id)
 
     return render_template(
         "userpage.html", title="My Account", url=os.getenv("URL"), names=listNameArray
     )
 
-
+@login_required
 @app.route("/create-newList", methods=["POST"])
 def createNewList():
     newList_name = request.form.get("newList")
@@ -410,12 +424,12 @@ def createNewList():
 
     return '{"id":"%s","success":true}' % newList_name
 
-
+@login_required
 @app.route("/list/<listName>", methods=["POST", "GET"])
 def listpage(listName):
 
     # get list of ids from the List table
-    listIds = getListIds()
+    listIds = getListIds(current_user.user_id)
 
     # loop to match listname and match to id
     for entry in listNameArray:
@@ -518,11 +532,12 @@ def login():
             # Return home page upon successful registration, assuming it's "index.html"
             # if the above check passes, then we know the user has the right credentials
             login_user(user)
+            user.is_active()
             print("User information:::", flush=True)
             print(current_user.user_id, flush=True)
             # return redirect(url_for('main.profile'))
             # return index()
-            return render_template("userhomepage.html")
+            return redirect("userpage")
         else:
             return error, 418
 
@@ -530,11 +545,12 @@ def login():
     return render_template("login.html")
 
 @login_required
+@app.route("/logout", methods=["POST"])
 def logout():
     logout_user()
-    return index()
+    return redirect("/")
     # return redirect(url_for('main.index'))
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=true)
