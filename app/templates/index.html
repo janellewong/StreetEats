@@ -116,7 +116,8 @@
                     <div class="col-md-8">
                         <div class="card-body">
 
-                            <form action="{{ url_for('restaurant' ,name=entry['name']) }}" method="POST" class="id">
+                            <form action="{{ url_for('restaurant' ,name=entry['name']) }}" method="POST" class="id"
+                                target="_blank">
                                 <button class="look-like-link" type=submit>{{entry['name']}}</button>
                                 <input type="hidden" name="id" value="{{entry['id']}}" />
                             </form>
