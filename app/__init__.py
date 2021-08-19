@@ -238,8 +238,7 @@ def index():
     city = None
 
     ## add dynamic user
-    # listNames = getListNames(1)
-    listNames = []
+    listNames = getListNames(1)
 
     if request.method == "POST":
         city = request.form.get("city")
