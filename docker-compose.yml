@@ -3,6 +3,7 @@ services:
   web:
     container_name: web
     build: .
+    image: streeteats:latest
     ports:
       - "5000:80"
     restart: always
