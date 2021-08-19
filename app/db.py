@@ -2,11 +2,13 @@ from flask import Flask, g
 from flask import session
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
+
+# from flask_migrate import Migrate
 from . import app
+from flask_login import UserMixin
 
 db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+# migrate = Migrate(app, db)
 
 friends = db.Table(
     "friends",
@@ -14,30 +16,44 @@ friends = db.Table(
         "user_id_fk", db.Integer, db.ForeignKey("users.user_id"), primary_key=True
     ),
     db.Column(
-        "friend_id", db.Integer, db.ForeignKey("users.user_id"), primary_key=True
+        "friend_id_fk", db.Integer, db.ForeignKey("users.user_id"), primary_key=True
     ),
 )
 
 # create user table
-class UserModel(db.Model):
+class UserModel(db.Model, UserMixin):
     __tablename__ = "users"
     # Add user id, username, password columns
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String())
     password = db.Column(db.String())
     lists = db.relationship("Lists", backref="List_OwnerID")
+
     # User has lists that refers to Lists db
     friendship = db.relationship(
         "UserModel",
         secondary=friends,
         primaryjoin=user_id == friends.c.user_id_fk,
-        secondaryjoin=user_id == friends.c.friend_id,
+        secondaryjoin=user_id == friends.c.friend_id_fk,
         backref="followed_by",
     )
 
-    def __init__(self, username, password):
+    def __init__(self, user_id, username, password):
+        self.user_id = user_id
         self.username = username
         self.password = password
+
+    def is_active(self):
+        return True
+
+    def is_active(self):
+        return self.user_id
+
+    def is_authenticated(self):
+        return self.authenticated
+
+    def get_id(self):
+        return int(self.user_id)
 
     def __repr__(self):
         return f"<User {self.username}>"
@@ -78,12 +94,14 @@ class Lists(db.Model):
 
 class BusinessList(db.Model):
     __tablename__ = "businesses"
+
     # Add id number of list, name of business, business_id columns
     business_id = db.Column(db.String, primary_key=True)
     business_name = db.Column(db.String())
     # list_id = db.Column(db.Integer, db.ForeignKey("lists.list_id"))
 
     ### Need Help with where / how to connect and assign attributes for each business here
+
     def __init__(self, business_id, business_name):
         self.business_id = business_id
         self.business_name = business_name
