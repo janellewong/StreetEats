@@ -556,7 +556,7 @@ def login():
             print(current_user.user_id, flush=True)
             # return redirect(url_for('main.profile'))
             # return index()
-            return redirect("userpage")
+            return redirect("/userpage")
         else:
             return error, 418
 
