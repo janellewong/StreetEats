@@ -360,13 +360,19 @@ def likeBusiness():
         # from .db import BusinessList, db
 
         business_data = request.form.get("business-id").split(", ")
-        business_id = business_data[0].replace("'", "").replace(")", "").replace("(", "")
-        business_name = business_data[1].replace("'", "").replace(")", "").replace("(", "")
+        business_id = (
+            business_data[0].replace("'", "").replace(")", "").replace("(", "")
+        )
+        business_name = (
+            business_data[1].replace("'", "").replace(")", "").replace("(", "")
+        )
         # print(business_id, flush=True)
         # print(business_name, flush=True)
 
         # insert into business table
-        add_business = BusinessList(business_id=business_id, business_name=business_name)
+        add_business = BusinessList(
+            business_id=business_id, business_name=business_name
+        )
         db.session.add(add_business)
         db.session.commit()
 
@@ -501,7 +507,6 @@ def settings():
     else:
         print("No active user, redirect to login", flush=True)
         return redirect(url_for("login"), code=302)
-    
 
 
 listNameArray = []
@@ -517,8 +522,11 @@ def userpage():
         listNameArray = getListNames(current_user.user_id)
 
         return render_template(
-        "userpage.html", title="My Account", url=os.getenv("URL"), names=listNameArray
-    )
+            "userpage.html",
+            title="My Account",
+            url=os.getenv("URL"),
+            names=listNameArray,
+        )
     else:
         print("No active user, redirect to login", flush=True)
         return redirect(url_for("login"), code=302)
@@ -536,7 +544,6 @@ def createNewList():
     else:
         print("No active user, redirect to login", flush=True)
         return redirect(url_for("login"), code=302)
-
 
 
 @login_required
@@ -596,11 +603,10 @@ def listpage(listName):
             url=os.getenv("URL"),
             data={"liked_businesses": liked_businesses},
             name=listName,
-        )    
+        )
     else:
         print("No active user, redirect to login", flush=True)
         return redirect(url_for("login"), code=302)
-    
 
 
 @app.route("/register", methods=["GET", "POST"])
