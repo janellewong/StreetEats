@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from dotenv import load_dotenv
 import requests
 from flask import request, redirect, url_for
@@ -259,6 +259,20 @@ class user_category:
         return self.type
 
 
+@app.route("/get_my_ip", methods=["GET"])
+def get_my_ip():
+
+    if request.environ.get("HTTP_X_FORWARDED_FOR") is None:
+        print(request.environ["REMOTE_ADDR"], flush=True)
+    else:
+        print(request.environ["HTTP_X_FORWARDED_FOR"], flush=True)  # if behind a proxy
+
+    return (
+        jsonify({"ip": request.environ["HTTP_X_FORWARDED_FOR"]}),
+        200,
+    )
+
+
 # restaurants
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -405,10 +419,65 @@ def check():
     return "Working"
 
 
-@login_required
-@app.route("/userhomepage")
+@app.route("/userhomepage", methods=["POST"])
 def userhomepage():
-    return render_template("userhomepage.html", title="Homepage", url=os.getenv("URL"))
+
+    testLocation = "toronto"
+    category = ""
+    city = None
+
+    ## add dynamic user
+    listNames = getListNames(1)
+
+    if request.method == "POST":
+        city = request.form.get("city")
+        selection = request.form.get("type")
+        S = user_category(selection, testLocation)
+        category = S.repr()
+
+    if city:
+        PARAMETERS_YELP = {
+            "term": category,
+            "limit": 50,
+            "offset": 50,
+            "radius": 10000,
+            "location": city,
+        }
+    else:
+        PARAMETERS_YELP = {
+            "term": category,
+            "limit": 50,
+            "offset": 50,
+            "radius": 10000,
+            "latitude": lat,
+            "longitude": long,
+        }
+
+    # check if it is already in the database
+    # if it is in , return it from db
+    # if not, add to database and return to user
+
+    response = requests.get(
+        url=ENDPOINT_YELP, params=PARAMETERS_YELP, headers=HEADERS_YELP
+    )
+    business_data = response.json()
+
+    # choose list
+    # is business id already in db-list?
+    # if it is, do nothing
+    # if not, add to database
+
+    # print(business_data)
+
+    # if logged in, do this (figure out user session)
+
+    return render_template(
+        "userhomepage.html",
+        title="Homepage",
+        url=os.getenv("URL"),
+        data=business_data,
+        listName=listNames,
+    )
 
 
 @login_required
