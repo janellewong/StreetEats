@@ -45,14 +45,15 @@
     </div>
 
     <br>
+    <div style="text-align:right">
 
-    <!-- delete list button here -->
-    <form action='/listpage' method="POST" class="removeList">
-      <div style="text-align:right">
+      <!-- delete list button here -->
+      <form action="/removeList" formaction="/removeList" method="POST" class="removeList">
         <input type="hidden" name="removelist" value="{{name}}" />
         <button class="btn btn-primary" type="submit" name="removeL" id="removeL" value="like">Delete list</button>
-      </div>
-    </form>
+      </form>
+    </div>
+
 
 
 
@@ -70,7 +71,7 @@
 
 $(document).ready(function() {
 $('.removeList').submit(function (e) {
-  e.preventDefault();
+  // e.preventDefault();
  
   $.ajax({
       url:"/removeList",
@@ -79,7 +80,7 @@ $('.removeList').submit(function (e) {
       data:$(e.target).serialize(),
       success: function (data) {
           console.log(data);
-          window.location.reload();
+          // window.location.reload();
       }
       });
 });

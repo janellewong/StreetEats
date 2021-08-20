@@ -10,7 +10,7 @@ from app.api import yelpReviews
 from app.api import yelpBusinessInfo
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
-from sqlalchemy.sql import select
+from sqlalchemy.sql import select, and_
 from flask import Flask, g
 from flask import session
 from dotenv import load_dotenv
@@ -76,10 +76,10 @@ migrate = Migrate(app, db)
 friends = db.Table(
     "friends",
     db.Column(
-        "user_id_fk", db.Integer, db.ForeignKey("users.user_id"), primary_key=True
+        "user_id_fk", db.Integer, db.ForeignKey("users.user_id", ondelete="CASCADE"), primary_key=True
     ),
     db.Column(
-        "friend_id", db.Integer, db.ForeignKey("users.user_id"), primary_key=True
+        "friend_id", db.Integer, db.ForeignKey("users.user_id", ondelete="CASCADE"), primary_key=True
     ),
 )
 
@@ -123,8 +123,8 @@ class UserModel(db.Model):
 
 listscontents = db.Table(
     "listscontents",
-    db.Column("list_id_fk", db.Integer, db.ForeignKey("lists.list_id")),
-    db.Column("business_id_fk", db.String, db.ForeignKey("businesses.business_id")),
+    db.Column("list_id_fk", db.Integer, db.ForeignKey("lists.list_id", ondelete="CASCADE")),
+    db.Column("business_id_fk", db.String, db.ForeignKey("businesses.business_id", ondelete="CASCADE")),
 )
 
 
@@ -133,7 +133,7 @@ class Lists(db.Model):
     # Add id number of user who owns list, name of list, list_id number columns
     list_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     list_name = db.Column(db.String())
-    user_id_fk = db.Column(db.Integer, db.ForeignKey("users.user_id"))
+    user_id_fk = db.Column(db.Integer, db.ForeignKey("users.user_id", ondelete="CASCADE"))
     listContents = db.relationship(
         "BusinessList",
         secondary=listscontents,
@@ -450,9 +450,29 @@ def removeList():
         if entry == removeName:
             index = listNames.index(entry)
             list_id_remove = listIds[index]  # LIST ID TO REMOVE
+            # print(f"list_id_remove: {list_id_remove}", flush=True)
+            # return list_id_remove
+            # db.session.query(listscontents).filter(listscontents.list_id_fk == list_id_remove).delete()
+            # Lists.query.filter(Lists.list_id == list_id_remove).delete()
+            # stmt = select([listscontents.list_id_fk]).where(listscontents.list_id_fk == list_id_remove).delete()
+            # stmt = listscontents.delete().where(Users.id.in_())
+            # results = select([listscontents.list_id_fk]).where(listscontents.list_id_fk == list_id_remove)
+            # for result in results:
+            #     db.session.delete(result)
+            #     db.session.commit()
+            Lists.query.filter(Lists.list_id == list_id_remove).delete()
+            
+        # results.delete()
+            db.session.commit()
+    return redirect(url_for("userpage"), code=302)
+
+            
+    # result = findId(removeName, listNames, listIds)
+    # print(f"Result: {result}", flush=True)
+    # # print(f"listNames: {listNames}", flush=True)
 
     # INSERT DB CODE TO REMOVE THE LIST ID FROM THE LISTID DB
-    return '{"id":"%s","success":true}' % list_id_remove
+            # return '{"id":"%s","success":true}' % list_id_remove
 
 
 @app.route("/removeResto", methods=["POST"])
@@ -608,6 +628,7 @@ def listpage(listName):
 
         # get list of ids from the List table
         listIds = getListIds(current_user.user_id)
+        liked_businesses = []
 
         # loop to match listname and match to id
         for entry in listNameArray:
@@ -615,43 +636,39 @@ def listpage(listName):
                 index = listNameArray.index(entry)
                 list_id = listIds[index]
 
-        # print(list_id)
+                idList = getBusinessId(list_id)
+                # print(idList)
 
-        idList = getBusinessId(list_id)
-        # print(idList)
+                for id in idList:
+                    ENDPOINT_YELPB = yelpBusinessInfo(id)
+                    responseB = requests.get(url=ENDPOINT_YELPB, headers=HEADERS_YELP)
+                    businessData = responseB.json()
 
-        liked_businesses = []
+                    # extract data from businessData to append to liked_businesses
+                    # price currently doesn't pull from API - check later
 
-        for id in idList:
-            ENDPOINT_YELPB = yelpBusinessInfo(id)
-            responseB = requests.get(url=ENDPOINT_YELPB, headers=HEADERS_YELP)
-            businessData = responseB.json()
+                    id1 = businessData["id"]
+                    name = businessData["name"]
+                    picture = businessData["image_url"]
+                    # price = businessData["price"]
+                    rating = businessData["rating"]
+                    # distance = businessData["distance"]
+                    phone = businessData["display_phone"]
+                    address = businessData["location"]["address1"]
 
-            # extract data from businessData to append to liked_businesses
-            # price currently doesn't pull from API - check later
+                    new_data = {
+                        "id": id1,
+                        "name": name,
+                        "picture": picture,
+                        # "distance": int(distance) / 1000,
+                        # "distance": distance,
+                        # "price": price,
+                        "rating": rating,
+                        "phone": phone,
+                        "address": address,
+                    }
 
-            id1 = businessData["id"]
-            name = businessData["name"]
-            picture = businessData["image_url"]
-            # price = businessData["price"]
-            rating = businessData["rating"]
-            # distance = businessData["distance"]
-            phone = businessData["display_phone"]
-            address = businessData["location"]["address1"]
-
-            new_data = {
-                "id": id1,
-                "name": name,
-                "picture": picture,
-                # "distance": int(distance) / 1000,
-                # "distance": distance,
-                # "price": price,
-                "rating": rating,
-                "phone": phone,
-                "address": address,
-            }
-
-            liked_businesses.append(new_data)
+                    liked_businesses.append(new_data)
 
         return render_template(
             "listpage.html",
