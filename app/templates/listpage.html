@@ -37,6 +37,7 @@
                 list</button>
             </div>
           </form>
+          <br>
 
 
           <div class="card-footer">
@@ -48,23 +49,20 @@
 
     <br>
 
-    <!-- delete list button here -->
-    <form action='/listpage' method="POST" class="removeList">
-      <div style="text-align:right">
-        <input type="hidden" name="removelist" value="{{name}}" />
-        <button class="btn btn-primary" type="submit" name="removeL" id="removeL" value="like">Delete list</button>
-      </div>
-    </form>
-
-
-
-
+    
     {% endfor %}
 
 
-
-
   </div>
+  <br>
+
+  <!-- delete list button here -->
+  <form action='/listpage' method="POST" class="removeList">
+    <div style="text-align:right">
+      <input type="hidden" name="removelist" value="{{name}}" />
+      <button class="btn btn-primary" type="submit" name="removeL" id="removeL" value="like">Delete list</button>
+    </div>
+  </form>
 
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
