@@ -54,9 +54,8 @@ Users are able to create new lists of restaurants to connect to their user profi
 ---
 ### Database Schema
 
-We're making use of 4 databases here: users, lists, businesses, listcontents
+We're making use of 4 databases here: users, lists, businesses and listcontents
 - The user_id key from the from the users table is used as a foreign key in the lists table enabling each user to have their set of restaurant lists.
-- The user_id key is also used in the list table to enable personalised lists of resturants for each user.
 - The table listcontents which stores the data of each user's personalised lists has the primary key list_id_fk and foreign key businesses_id_fk.
 - Tables users and lists have one to many relationships with lists, businesses and listcontents respectively.
 
