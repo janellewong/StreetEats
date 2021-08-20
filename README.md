@@ -7,10 +7,6 @@ StreetEats is a website that allows users to access local restaurants based on t
 Website Link:(https://street-eats.tech/)
 
 <img width="1000" alt="Screen Shot 2021-08-20 at 12 57 55 PM" src="https://user-images.githubusercontent.com/38405709/130287628-78beb3e5-c926-4b28-af14-d35b6847e0fe.png">
-<img width="250" alt="Screen Shot 2021-08-20 at 12 58 31 PM" src="https://user-images.githubusercontent.com/38405709/130287669-df8fd070-3524-40a3-a6c1-2780c246e16e.png">
-<img width="250" alt="Screen Shot 2021-08-20 at 1 00 10 PM" src="https://user-images.githubusercontent.com/38405709/130287686-d2e0c4d2-5f26-4c43-8539-f19ab418d339.png">
-<img width="250" alt="Screen Shot 2021-08-20 at 1 00 47 PM" src="https://user-images.githubusercontent.com/38405709/130287697-13159601-23d3-45c2-8d3c-7a95766e9f36.png">
-
 
 ---
 
