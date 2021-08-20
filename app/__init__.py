@@ -76,10 +76,16 @@ migrate = Migrate(app, db)
 friends = db.Table(
     "friends",
     db.Column(
-        "user_id_fk", db.Integer, db.ForeignKey("users.user_id", ondelete="CASCADE"), primary_key=True
+        "user_id_fk",
+        db.Integer,
+        db.ForeignKey("users.user_id", ondelete="CASCADE"),
+        primary_key=True,
     ),
     db.Column(
-        "friend_id", db.Integer, db.ForeignKey("users.user_id", ondelete="CASCADE"), primary_key=True
+        "friend_id",
+        db.Integer,
+        db.ForeignKey("users.user_id", ondelete="CASCADE"),
+        primary_key=True,
     ),
 )
 
@@ -123,8 +129,14 @@ class UserModel(db.Model):
 
 listscontents = db.Table(
     "listscontents",
-    db.Column("list_id_fk", db.Integer, db.ForeignKey("lists.list_id", ondelete="CASCADE")),
-    db.Column("business_id_fk", db.String, db.ForeignKey("businesses.business_id", ondelete="CASCADE")),
+    db.Column(
+        "list_id_fk", db.Integer, db.ForeignKey("lists.list_id", ondelete="CASCADE")
+    ),
+    db.Column(
+        "business_id_fk",
+        db.String,
+        db.ForeignKey("businesses.business_id", ondelete="CASCADE"),
+    ),
 )
 
 
@@ -133,7 +145,9 @@ class Lists(db.Model):
     # Add id number of user who owns list, name of list, list_id number columns
     list_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     list_name = db.Column(db.String())
-    user_id_fk = db.Column(db.Integer, db.ForeignKey("users.user_id", ondelete="CASCADE"))
+    user_id_fk = db.Column(
+        db.Integer, db.ForeignKey("users.user_id", ondelete="CASCADE")
+    )
     listContents = db.relationship(
         "BusinessList",
         secondary=listscontents,
@@ -461,18 +475,17 @@ def removeList():
             #     db.session.delete(result)
             #     db.session.commit()
             Lists.query.filter(Lists.list_id == list_id_remove).delete()
-            
-        # results.delete()
+
+            # results.delete()
             db.session.commit()
     return redirect(url_for("userpage"), code=302)
 
-            
     # result = findId(removeName, listNames, listIds)
     # print(f"Result: {result}", flush=True)
     # # print(f"listNames: {listNames}", flush=True)
 
     # INSERT DB CODE TO REMOVE THE LIST ID FROM THE LISTID DB
-            # return '{"id":"%s","success":true}' % list_id_remove
+    # return '{"id":"%s","success":true}' % list_id_remove
 
 
 @app.route("/removeResto", methods=["POST"])
