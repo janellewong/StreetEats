@@ -401,7 +401,12 @@ def modalLike():
 
         # print(listIds, flush=True)
 
-        addRestaurantToList(list_id, business_id)
+        bIds = getBusinessId(list_id)
+        # print(f"Business Ids: {bIds}", flush=True)
+
+        # do not allow duplicates
+        if business_id not in bIds:
+            addRestaurantToList(list_id, business_id)     
 
         return '{"id":"%s","success":true}' % listname
 
