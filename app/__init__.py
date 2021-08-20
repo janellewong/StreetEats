@@ -455,7 +455,7 @@ def removeList():
 
 
 """ @app.route("/removeResto", methods=["POST"])
-def removeList():
+def removeResto():
     removeName = request.form.get("removeResto")
     listNames = getListNames(current_user.user_id)
     listIds = getListIds(current_user.user_id)
@@ -642,6 +642,8 @@ def listpage(listName):
             }
 
             liked_businesses.append(new_data)
+            # print(liked_businesses, flush=True)
+            print(liked_businesses[0], flush=True)  # TESTING
 
         return render_template(
             "listpage.html",
