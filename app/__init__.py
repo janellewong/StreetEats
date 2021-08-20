@@ -451,21 +451,32 @@ def removeList():
             index = listNames.index(entry)
             list_id_remove = listIds[index]  # LIST ID TO REMOVE
 
+    # INSERT DB CODE TO REMOVE THE LIST ID FROM THE LISTID DB
     return '{"id":"%s","success":true}' % list_id_remove
 
 
-""" @app.route("/removeResto", methods=["POST"])
+@app.route("/removeResto", methods=["POST"])
 def removeResto():
-    removeName = request.form.get("removeResto")
+    restoID, listName = request.form.get(
+        "removeResto"
+    )  # pull restaurant id AND list name
     listNames = getListNames(current_user.user_id)
     listIds = getListIds(current_user.user_id)
 
+    # first get the list_id of the list the restaurant is stored in
     for entry in listNames:
-        if entry == removeName:
+        if entry == listName:
             index = listNames.index(entry)
-            resto_id_remove = listIds[index]  # LIST ID TO REMOVE
+            list_id = listIds[index]  # LIST ID
 
-    return "hello" """
+    idList = getBusinessId(list_id)  # now get the business ids array of that list id
+
+    # if restaurantid is found in the businessid array for that list delete the restaurant id
+    for id in idList:
+        if restoID == id:
+            print("REMOVE restoID from DATABASE")  # DB CODE INSERT HERE
+
+    return '{"id":"%s","success":true}' % restoID
 
 
 @app.route("/userhomepage", methods=["POST"])
@@ -642,8 +653,6 @@ def listpage(listName):
             }
 
             liked_businesses.append(new_data)
-            # print(liked_businesses, flush=True)
-            print(liked_businesses[0], flush=True)  # TESTING
 
         return render_template(
             "listpage.html",

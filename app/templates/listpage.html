@@ -25,47 +25,85 @@
             <strong>Rating: </strong>{{entry['rating']}}
             <br> <strong>Phone: </strong>{{entry['phone']}}
             <br> <strong>Address: </strong>{{entry['address']}}
-          
-          <!-- remove from list button here -->
-          <form action='/listpage' method="POST" class="like-form">
+
+            <!-- remove from list button here -->
+          <form action="/listpage" method="POST" class="removeResto">
             <div style="text-align:right">
-                <input type="hidden" name="business-id" value="{{entry['id'], entry['name']}}" />
-                <button class="btn btn-primary" data-bs-toggle="modal"
-                    data-bs-target="#exampleModal" type="submit" name="like" id="like"
-                    value="like">Remove from list</button>
+              <input type="hidden" name="removeResto" value="{{entry['id'],name}}" />
+              <button class="btn btn-primary" type="submit" name="removeR" id="removeR" value="like">Remove from
+                list</button>
             </div>
           </form>
 
-        </div>
-        <div class="card-footer">
-          <!-- <small class="text-muted">Distance from you: {{entry['distance']}} m</small> -->
+
+          <div class="card-footer">
+            <!-- <small class="text-muted">Distance from you: {{entry['distance']}} m</small> -->
+          </div>
         </div>
       </div>
     </div>
+
+    <br>
+
+    <!-- delete list button here -->
+    <form action='/listpage' method="POST" class="removeList">
+      <div style="text-align:right">
+        <input type="hidden" name="removelist" value="{{name}}" />
+        <button class="btn btn-primary" type="submit" name="removeL" id="removeL" value="like">Delete list</button>
+      </div>
+    </form>
+
+
+
+
+    {% endfor %}
+
+
+
+
   </div>
 
-  <br>
 
-  <!-- delete list button here -->
-  <form action='/listpage' method="POST" class="like-form">
-    <div style="text-align:right">
-        <input type="hidden" name="business-id" />
-        <button class="btn btn-primary" data-bs-toggle="modal"
-            data-bs-target="#exampleModal" type="submit" name="like" id="like"
-            value="like">Delete list</button>
-    </div>
-  </form>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script type=text/javascript>
 
-  {% endfor %}
+$(document).ready(function() {
+$('.removeList').submit(function (e) {
+  e.preventDefault();
+ 
+  $.ajax({
+      url:"/removeList",
+      type:"POST",
+      cache:false,
+      data:$(e.target).serialize(),
+      success: function (data) {
+          console.log(data);
+          window.location.reload();
+      }
+      });
+});
+});
+
+$('.removeResto').submit(function (e) {
+  e.preventDefault();
+ 
+  $.ajax({
+      url:"/removeResto",
+      type:"POST",
+      cache:false,
+      data:$(e.target).serialize(),
+      success: function (data) {
+          console.log(data);
+          window.location.reload();
+      }
+      });
+});
+
+</script>
 
 
 
 
-</div>
 
 
-
-
-
-
-{% endblock %}
+  {% endblock %}
