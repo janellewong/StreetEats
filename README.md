@@ -9,10 +9,10 @@ Website Link:(https://street-eats.tech/)
 The home page consists of a search bar where you enter the type of food and the location. If no location is entered then the user's location is utilized. The navigation bar has links to the Login and Register page.
 <img width="1000" alt="Screen Shot 2021-08-20 at 12 57 55 PM" src="https://user-images.githubusercontent.com/38405709/130287628-78beb3e5-c926-4b28-af14-d35b6847e0fe.png">
 
-Once the search command has been processed resturants at that location that provide the cuisine are displayed.
+Once the search command has been processed restaurants at that location that provide the cuisine are displayed.
 <img width="1429" alt="Screen Shot 2021-08-20 at 12 58 31 PM" src="https://user-images.githubusercontent.com/38405709/130298868-65c92fb8-0f16-4063-9816-c6e03b6c02ae.png">
 
-Your favourite resturants can be added to a personal list and saved.
+Your favourite restaurants can be added to a personal list and saved.
 <img width="1436" alt="Screen Shot 2021-08-20 at 1 00 10 PM" src="https://user-images.githubusercontent.com/38405709/130299551-a343d4f2-31ae-465a-8d81-5b554273e0ca.png">
 <img width="1437" alt="Screen Shot 2021-08-20 at 1 00 47 PM" src="https://user-images.githubusercontent.com/38405709/130299569-5383372f-8caa-4060-96a0-ee079eb068ba.png">
 
@@ -31,7 +31,7 @@ To run the website as an application use:
 
 ### Main Features and Implementation
 #### Registration and Login
-Registration and login information are stored in a postgreSQL database to allow each user to have unique lists and account information. 
+Registration and login information is stored in a postgreSQL database to allow each user to have unique lists and account information. 
 
 #### Restaurant Lists
 Users are able to create new lists of restaurants to connect to their user profile, and add/remove as many restaurants to any of their lists. The information for restaurants is pulled from the YelpFusion API and stored into a database, Restaurants. The title for the list of restaurants can then be added/removed in a user's restaurant list, which connects the User database and Lists database. The Restaurants database the interacts with our Lists database, which is connected to a User database. These databases are postgreSQL databases.
