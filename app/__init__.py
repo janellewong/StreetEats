@@ -105,6 +105,7 @@ class UserModel(db.Model):
         secondaryjoin=user_id == friends.c.friend_id,
         backref="followed_by",
     )
+
     def __init__(self, username, password):
         # self.user_id = user_id
         self.username = username
@@ -244,7 +245,6 @@ def getBusinessId(list_id):
         idList.append(id.business_id_fk)
 
     return idList
-
 
 
 ## return friends ids
@@ -586,7 +586,9 @@ def settings():
 def newPassword():
     newPass = request.form.get("changePass")
     # NEW PASSWORD TO ADD TO DATABASE
-    db.session.query(UserModel).filter(UserModel.user_id == current_user.user_id).update({'password': generate_password_hash(newPass)})
+    db.session.query(UserModel).filter(
+        UserModel.user_id == current_user.user_id
+    ).update({"password": generate_password_hash(newPass)})
     db.session.commit()
     return '{"success":true}'
 
