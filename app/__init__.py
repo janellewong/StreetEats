@@ -406,7 +406,7 @@ def modalLike():
 
         # do not allow duplicates
         if business_id not in bIds:
-            addRestaurantToList(list_id, business_id)     
+            addRestaurantToList(list_id, business_id)
 
         return '{"id":"%s","success":true}' % listname
 
