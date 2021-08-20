@@ -593,6 +593,15 @@ def settings():
         return redirect(url_for("login"), code=302)
 
 
+@login_required
+@app.route("/newPassword", methods=["POST"])
+def newPassword():
+    newPass = request.form.get("changePass")
+    # NEW PASSWORD TO ADD TO DATABASE
+
+    return '{"success":true}'
+
+
 listNameArray = []
 
 
@@ -605,24 +614,11 @@ def userpage():
         ## make dynamic for user logged in
         listNameArray = getListNames(current_user.user_id)
 
-        listIds = getListIds(current_user.user_id)
-
-        numItems = []
-
-        # loop to match listname and match to id
-        for entry in listIds:
-            idList = getBusinessId(entry)
-            num_of_items = len(idList)
-            numItems.append(num_of_items)
-
-        # print(list_id)
-
         return render_template(
             "userpage.html",
             title="My Account",
             url=os.getenv("URL"),
             names=listNameArray,
-            num=numItems,
         )
     else:
         print("No active user, redirect to login", flush=True)
