@@ -439,6 +439,7 @@ def restaurant(name):
 def check():
     return "Working"
 
+
 """ @app.route("/removeResto", method=["POST"])
 def removeList():
     removeName = request.form.get("removeResto")
