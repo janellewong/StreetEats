@@ -46,13 +46,14 @@
     </div>
   </div>
 
-  {% endfor %}
+  <br>
 
+  {% endfor %}
 
   <br>
 
   <!-- delete list button here -->
-  <form action='/listpage' method="POST" class="removeList">
+  <form action='/removeList' method="POST" class="removeList">
     <div style="text-align:right">
       <input type="hidden" name="removelist" value="{{name}}" />
       <button class="btn btn-primary" type="submit" name="removeL" id="removeL" value="like">Delete list</button>
@@ -65,7 +66,7 @@
 
 $(document).ready(function() {
 $('.removeList').submit(function (e) {
-  e.preventDefault();
+  // e.preventDefault();
  
   $.ajax({
       url:"/removeList",
@@ -74,7 +75,7 @@ $('.removeList').submit(function (e) {
       data:$(e.target).serialize(),
       success: function (data) {
           console.log(data);
-          window.location.reload();
+          // window.location.reload();
       }
       });
 });
