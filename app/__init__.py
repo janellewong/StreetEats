@@ -592,11 +592,24 @@ def userpage():
         ## make dynamic for user logged in
         listNameArray = getListNames(current_user.user_id)
 
+        listIds = getListIds(current_user.user_id)
+
+        numItems = []
+
+        # loop to match listname and match to id
+        for entry in listIds:
+            idList = getBusinessId(entry)
+            num_of_items = len(idList)
+            numItems.append(num_of_items)
+
+        # print(list_id)
+
         return render_template(
             "userpage.html",
             title="My Account",
             url=os.getenv("URL"),
             names=listNameArray,
+            num=numItems,
         )
     else:
         print("No active user, redirect to login", flush=True)
@@ -693,10 +706,23 @@ def register():
 
         if not username:
             error = "Username is required."
+            return (
+                render_template("register.html", url=os.getenv("URL"), message=error),
+                418,
+            )
         elif not password:
             error = "Password is required."
+            return (
+                render_template("register.html", url=os.getenv("URL"), message=error),
+                418,
+            )
+
         elif UserModel.query.filter_by(username=username).first() is not None:
             error = f"User {username} is already registered."
+            return (
+                render_template("register.html", url=os.getenv("URL"), message=error),
+                418,
+            )
 
         if error is None:
             new_user = UserModel(username, generate_password_hash(password))
@@ -725,8 +751,17 @@ def login():
 
         if user is None:
             error = "Incorrect username."
+            return (
+                render_template("login.html", url=os.getenv("URL"), message=error),
+                418,
+            )
+
         elif not check_password_hash(user.password, password):
             error = "Incorrect password."
+            return (
+                render_template("login.html", url=os.getenv("URL"), message=error),
+                418,
+            )
 
         if error is None:
 
