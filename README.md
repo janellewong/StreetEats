@@ -23,6 +23,7 @@ You can search for locations without logging in *however*, you cannot make your 
 
 ### Getting Started
 This example uses features in Docker 3.3. 2. Install this version to run.
+
 To run the website as an application use:
 ```docker-compose up --build``` 
 
@@ -78,7 +79,7 @@ Both CI and CD workflows are automated.
 
 ---
 ### Testing
-The project has a linter check over our code when someone makes a pull request to ensure optimal execution at all points.
+A linter check over the code occurs when someone makes a pull request to ensure optimal execution at all points.
 
 ---
 ### Challenges and Solutions
