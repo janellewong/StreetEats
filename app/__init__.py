@@ -457,9 +457,8 @@ def removeList():
 
 @app.route("/removeResto", methods=["POST"])
 def removeResto():
-    restoID, listName = request.form.get(
-        "removeResto"
-    )  # pull restaurant id AND list name
+    restoID = request.form.get("removeResto")  # pull restaurant id AND list name
+    listName = request.form.get("listName_Resto")
     listNames = getListNames(current_user.user_id)
     listIds = getListIds(current_user.user_id)
 

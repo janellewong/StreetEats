@@ -29,7 +29,8 @@
             <!-- remove from list button here -->
           <form action="/listpage" method="POST" class="removeResto">
             <div style="text-align:right">
-              <input type="hidden" name="removeResto" value="{{entry['id'],name}}" />
+              <input type="hidden" name="removeResto" value="{{entry['id']}}" />
+              <input type="hidden" name="listName_Resto" value="{{name}}" />
               <button class="btn btn-primary" type="submit" name="removeR" id="removeR" value="like">Remove from
                 list</button>
             </div>
