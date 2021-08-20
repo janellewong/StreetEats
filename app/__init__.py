@@ -464,28 +464,11 @@ def removeList():
         if entry == removeName:
             index = listNames.index(entry)
             list_id_remove = listIds[index]  # LIST ID TO REMOVE
-            # print(f"list_id_remove: {list_id_remove}", flush=True)
-            # return list_id_remove
-            # db.session.query(listscontents).filter(listscontents.list_id_fk == list_id_remove).delete()
-            # Lists.query.filter(Lists.list_id == list_id_remove).delete()
-            # stmt = select([listscontents.list_id_fk]).where(listscontents.list_id_fk == list_id_remove).delete()
-            # stmt = listscontents.delete().where(Users.id.in_())
-            # results = select([listscontents.list_id_fk]).where(listscontents.list_id_fk == list_id_remove)
-            # for result in results:
-            #     db.session.delete(result)
-            #     db.session.commit()
             Lists.query.filter(Lists.list_id == list_id_remove).delete()
 
             # results.delete()
             db.session.commit()
     return redirect(url_for("userpage"), code=302)
-
-    # result = findId(removeName, listNames, listIds)
-    # print(f"Result: {result}", flush=True)
-    # # print(f"listNames: {listNames}", flush=True)
-
-    # INSERT DB CODE TO REMOVE THE LIST ID FROM THE LISTID DB
-    # return '{"id":"%s","success":true}' % list_id_remove
 
 
 @app.route("/removeResto", methods=["POST"])
@@ -504,9 +487,12 @@ def removeResto():
     idList = getBusinessId(list_id)  # now get the business ids array of that list id
 
     # if restaurantid is found in the businessid array for that list delete the restaurant id
-    for id in idList:
-        if restoID == id:
-            print("REMOVE restoID from DATABASE")  # DB CODE INSERT HERE
+    # for id in idList:
+    if restoID in idList:
+        d = listscontents.delete().filter_by(business_id_fk=restoID, list_id_fk=int(list_id))
+        db.session.execute(d)
+        db.session.commit()
+        print("REMOVE restoID from DATABASE")  # DB CODE INSERT HERE
 
     return '{"id":"%s","success":true}' % restoID
 
