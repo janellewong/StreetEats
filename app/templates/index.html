@@ -56,11 +56,9 @@
     <div class=homepage>
         <div class="background">
             <div class=center-logo>
-                <img src="static/img/logo-black.jpg" class="center-logo">
+                <img src="static/img/frontpage-logo.jpg" class="center-logo">
                 <br>
             </div>
-
-
 
             <div>
                 <p style="text-align:center">Search restaurants in a location you want or near your current location!
@@ -88,9 +86,10 @@
                             placeholder="City">
                         <label for="floatingInput">Location (City)</label>
                     </div>
+                    <p>** Leave the location blank if you want to search restaurants near you</p>
+                    <br>
                     <button class="btn btn-primary" type="submit" id="submit" name="submit"
                         value="search">Search</button>
-
 
                     <br><br>
                 </form>
@@ -110,7 +109,7 @@
                 <div class="row g-0">
                     <div class="col-md-4">
                         <div class="photo-results">
-                            <img src="{{entry['image_url']}}" class="img-fluid rounded-start" alt="...">
+                            <img src="{{entry['image_url']}}" class="img-fluid rounded-start" alt="..." style="width:100%;" style="height: 100%;" style= "background-size: cover;">
                         </div>
                     </div>
                     <div class="col-md-8">
@@ -131,17 +130,9 @@
                                 {{entry['location']['city']}}, {{entry['location']['state']}}
                                 {{entry['location']['zip_code']}}, {{entry['location']['country']}}
 
-                            <form action='/' method="POST" class="like-form">
-                                <div style="text-align:right">
-                                    <!-- Like Count: <span class="like-count">1</span> -->
-                                    <input type="hidden" name="business-id" value="{{entry['id'], entry['name']}}" />
-                                    <button class="btn btn-primary" data-bs-toggle="modal"
-                                        data-bs-target="#exampleModal" type="submit" name="like" id="like"
-                                        value="like">Add to list</button>
-                                </div>
-                            </form>
 
-                            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+
+                            <p class="card-text"><small class="text-muted">Last updated 5 mins ago</small></p>
                         </div>
                         <div class="card-footer">
                             <small class="text-muted">Distance from you: {{entry['distance']}} metres</small>
@@ -204,37 +195,6 @@
                     var cleanedData = data.split('<!--SEARCH_RESULTS_START-->')[1].split('<!--SEARCH_RESULTS_END-->')[0]
                     $('#search-results').html(cleanedData);
 
-                    $('.like-form').submit(function (e) {
-                            e.preventDefault();
-                           
-                            $.ajax({
-                                url:"/like-business",
-                                type:"POST",
-                                cache:false,
-                                data:$(e.target).serialize(),
-                                success: function (data) {
-                                    console.log(data);
-                                    var likeCountSpan = $(e.target).find('.like-count')[0]
-                                    var newLikeCount = Number(likeCountSpan.innerText) + 1
-                                    likeCountSpan.innerText = `${newLikeCount}`
-                                }
-                                });
-                        });
-
-                        $('.modal-liked').submit(function (e) {
-                             e.preventDefault();
-           
-                            $.ajax({
-                                url:"/modal-like",
-                                type:"POST",
-                                cache:false,
-                                data:$(e.target).serialize(),
-                                success: function (data) {
-                                    console.log(data);
-                                
-                                }
-                                });
-                        });
 
                     jQuery('html, body').animate({
                         scrollTop: jQuery("#search-results").offset().top

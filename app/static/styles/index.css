@@ -8,26 +8,45 @@ html {
 }
 
 .photo-results {
-    /* max-width: 100%;
-    max-height: 150px;
-    max-height: 100%;
+    max-height: 233px;
+    max-width: 100%;
     overflow: hidden;
+
+    width: 100%;
+    background-size: cover;
+    object-fit: cover;
+    height: 100%;
+    background-attachment: fixed;
+    background-position: center;
     
-    display: block;
+    /* display: block;
     width: 345px;
     height: 220px;
     object-fit: cover;
     width: 100%; 
     height: 100%; */
 
-    width: 100%;
+    /* width: 100%;
     background-size: cover;
     object-fit: cover;
     height: 100%;
     overflow: hidden;
     background-attachment: fixed;
-    background-position: center;
+    background-position: center; */
 
+}
+
+.photo-userhome {
+    max-height: 271px;
+    max-width: 100%;
+    overflow: hidden;
+
+    width: 100%;
+    background-size: cover;
+    object-fit: cover;
+    height: 100%;
+    background-attachment: fixed;
+    background-position: center;
 }
 
 .center-logo {
@@ -60,17 +79,6 @@ html {
     border-color: transparent;
 }
 
-/* .background {
-    background-image: url("/static/img/background.jpg");
-
-    height: 100%;
-
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-} */
-
-
 .nav-link {
     position: left;
 }
@@ -85,11 +93,11 @@ html {
 }
 
 .paddingl {
-    padding-top: 1vh;
-    padding-right: 15vw;
-    padding-left: 15vw;
-    background-color: #dff9fb;
-    height: 100vh;
+    padding-top: 1vh!important;
+    padding-right: 15vw!important;
+    padding-left: 15vw!important;
+    background-color: #dff9fb!important;
+    height: 100vh!important;
 
 }
 

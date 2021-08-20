@@ -23,7 +23,7 @@ Users are able to create new lists of restaurants to connect to their user profi
 
 
 ### Challenges and Solutions
-Understanding how to connect our 3 APIs and our multiple databases was a challenge. We decided to divide API and database related tasks to assign to each team member. We had to stay organized and in communication to piece together our 3 APIs and our databases. We researched postgreSQL and API get/post requests in our asigned sections, and asked for help as needed.
+Understanding how to connect our 3 APIs and our multiple databases was a challenge. We decided to divide API and database related tasks to assign to each team member. We had to stay organized and in communication to piece together our 3 APIs and our databases. We researched postgreSQL and API get/post requests in our assigned sections, and asked for help as needed.
 
 ### License
 [MIT License](https://github.com/janellewong/StreetEats/blob/main/LICENSE)

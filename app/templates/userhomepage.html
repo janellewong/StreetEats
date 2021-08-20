@@ -3,80 +3,228 @@
 {% block content %}
 
 <div class=homepage>
-    <!-- <div style="background-image: url('static/img/background-food.jpg');"></div> -->
-    <div>
-        <img src="static/img/logo-black.jpg" class="center-logo">
-        <br>
-    </div>
+    <div class="background">
+        <div class=center-logo>
+            <img src="static/img/frontpage-logo.jpg" class="center-logo">
+            <br>
+        </div>
 
-    <div>
-        <p style="text-align:center">Search restaurants in a location you want or near your current location! <br>
-        Save your favourite restaurant to your lists! <br>
-        </p> 
-    <br>
-    </div>
-    
-    <div class="paddingl">
-        <form action="/" method="POST">
-            <div class="form-floating mb-3">
-                <input id ="type" name ="type" type="text" class="form-control" id="floatingInput" placeholder="Category">
-                <label for="floatingInput">Category</label>
-            </div>
+        <div>
+            <p style="text-align:center">Search restaurants in a location you want or near your current location!
+                <br>
+                Create lists on your account and save your favourite restaurants to your lists! <br>
+            </p>
+            <br>
+            <br>
+        </div>
 
-            <div class="form-floating mb-3">
-                <input id ="city" name ="city" type="text" class="form-control" id="floatingInput" placeholder="City">
-                <label for="floatingInput">Location (City)</label>
-            </div>
-            <a href ="#search-results">
-                <button class="btn btn-primary" type="submit" id="submit" name="submit" value="search">Search</button>
-            </a>
-            <br><br>
-        </form>
-    </div>
-</div>
+        <div class="paddingl">
+            <form action="/" method="POST" class="search-form">
+                <div class="form-floating mb-3">
+                    <input id="type" name="type" type="text" class="form-control" id="floatingInput"
+                        placeholder="Category">
+                    <label for="floatingInput">Category</label>
+                </div>
 
+                <div class="form-floating mb-3">
+                    <input id="city" name="city" type="text" class="form-control" id="floatingInput"
+                        placeholder="City">
+                    <label for="floatingInput">Location (City)</label>
+                </div>
+                <p>** Leave the location blank if you want to search restaurants near you</p>
+                <br>
+                <button class="btn btn-primary" type="submit" id="submit" name="submit"
+                    value="search">Search</button>
 
-{% if section %}
-<script>
-    $(function() {
-       $("html, body").animate({ scrollTop: $("#{{ searchresults }}").offset().top }, 500);
-    });
-</script>
-{% endif %}
-
-
-
-<div class="searchresults">
-    <h1>Search results: </h1>
-    <br>
-
-    {% for entry in data["businesses"] %}
-    <div class="card mb-3" style="max-width: 1050px;" style="max-height: 50%;">
-        <div class="row g-0">
-          <div class="col-md-4">
-            <img src="{{entry['image_url']}}" class="img-fluid rounded-start" alt="...">
-          </div>
-          <div class="col-md-8">
-            <div class="card-body">
-              <h5 class="card-title">{{entry['name']}}</h5>
-              <p class="card-text">Rating: {{entry['rating']}}
-                <br> Price: {{entry['price']}}
-                <br> Phone: {{entry['phone']}}
-                <br> Address: {{entry['location.address1']}}
-                <br> 
-                <button class="card text-end">Add to list</button>
-              <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-            </div>
-            <div class="card-footer">
-                <small class="text-muted">Distance from you: {{entry['distance']}} metres</small>
-            </div>
-          </div>
+                <br><br>
+            </form>
         </div>
     </div>
 
 
-    {% endfor %}
+    <div class="searchresults" id="search-results">
+        <!--SEARCH_RESULTS_START-->
+        <h1>Search results: </h1>
+        <br>
 
-</div>
+        {% for entry in data["businesses"] %}
+        <div class="card mb-3" style="max-width: 1050px;" style="max-height: 50%;">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <div class="photo-userhome">
+                        <img src="{{entry['image_url']}}" class="img-fluid rounded-start" alt="...">
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
 
-{% endblock %}
+                        <form action="{{ url_for('restaurant' ,name=entry['name']) }}" method="POST" class="id"
+                            target="_blank">
+                            <button class="look-like-link" type=submit>{{entry['name']}}</button>
+                            <input type="hidden" name="id" value="{{entry['id']}}" />
+                        </form>
+
+                        <p class="card-text">
+                            <strong>Rating: </strong>{{entry['rating']}}
+                            <br> <strong>Price: </strong>{{entry['price']}}
+                            <br> <strong>Phone: </strong>{{entry['display_phone']}}
+                            <br> <strong>Address: </strong>{{entry['location']['address1']}},
+                            {{entry['location']['city']}}, {{entry['location']['state']}}
+                            {{entry['location']['zip_code']}}, {{entry['location']['country']}}
+
+                        <form action='/userhomepage' method="POST" class="like-form">
+                            <div style="text-align:right">
+                                <input type="hidden" name="business-id" value="{{entry['id'], entry['name']}}" />
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal"
+                                    type="submit" name="like" id="like" value="like">Add to list</button>
+                            </div>
+                        </form>
+
+                        <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">Distance from you: {{entry['distance']}} metres</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Add to List</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        {% for listN in listName %}
+                        <ul>
+                            <form action="/userhomepage" method="POST" class="modal-liked">
+                                <button class="btn btn-primary" data-bs-dismiss="modal" type="submit">{{listN}}</button>
+                                <input type="hidden" name="modal-liked" value="{{listN}}" />
+                            </form>
+                        </ul>
+                        {% endfor %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        {% endfor %}
+        <!--SEARCH_RESULTS_END-->
+
+
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script type=text/javascript>
+
+
+$(document).ready(function() {
+$('.search-form').submit(function (e) {
+    e.preventDefault();
+
+    $.ajax({
+        url:"/userhomepage",
+        type:"POST",
+        cache:false,
+        data:$(e.target).serialize(),
+        success: function (data) {
+            console.log(data);
+            var cleanedData = data.split('<!--SEARCH_RESULTS_START-->')[1].split('<!--SEARCH_RESULTS_END-->')[0]
+            $('#search-results').html(cleanedData);
+
+            $('.like-form').submit(function (e) {
+                    e.preventDefault();
+                   
+                    $.ajax({
+                        url:"/like-business",
+                        type:"POST",
+                        cache:false,
+                        data:$(e.target).serialize(),
+                        success: function (data) {
+                            console.log(data);
+                            var likeCountSpan = $(e.target).find('.like-count')[0]
+                            var newLikeCount = Number(likeCountSpan.innerText) + 1
+                            likeCountSpan.innerText = `${newLikeCount}`
+                        }
+                        });
+                });
+
+                $('.modal-liked').submit(function (e) {
+                     e.preventDefault();
+   
+                    $.ajax({
+                        url:"/modal-like",
+                        type:"POST",
+                        cache:false,
+                        data:$(e.target).serialize(),
+                        success: function (data) {
+                            console.log(data);
+                        
+                        }
+                        });
+                });
+
+            jQuery('html, body').animate({
+                scrollTop: jQuery("#search-results").offset().top
+            }, 777);
+           
+        }
+        });
+});
+});
+
+$('.like-form').submit(function (e) {
+    e.preventDefault();
+
+    $.ajax({
+        url:"/like-business",
+        type:"POST",
+        cache:false,
+        data:$(e.target).serialize(),
+        success: function (data) {
+            console.log(data);
+            var likeCountSpan = $(e.target).find('.like-count')[0]
+            var newLikeCount = Number(likeCountSpan.innerText) + 1
+            likeCountSpan.innerText = `${newLikeCount}`
+        }
+        });
+});
+
+$('.modal-liked').submit(function (e) {
+    e.preventDefault();
+   
+    $.ajax({
+        url:"/modal-like",
+        type:"POST",
+        cache:false,
+        data:$(e.target).serialize(),
+        success: function (data) {
+            console.log(data);
+           
+        }
+        });
+});
+
+
+
+
+
+</script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://unpkg.com/ionicons@5.5.1/dist/ionicons.js"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script>
+
+
+
+        {% endblock %}
