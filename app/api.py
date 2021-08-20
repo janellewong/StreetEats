@@ -8,7 +8,7 @@ from flask import request
 def api_location(ip):
 
     print(ip)
-
+    # API #2
     ENDPOINT_LOC = f"https://ipinfo.io/{ip}?token=e5705a55652e77"  # method: GET
     response_loc = requests.get(url=ENDPOINT_LOC)
     print(response_loc)
