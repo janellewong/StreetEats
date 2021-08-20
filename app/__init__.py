@@ -489,7 +489,9 @@ def removeResto():
     # if restaurantid is found in the businessid array for that list delete the restaurant id
     # for id in idList:
     if restoID in idList:
-        d = listscontents.delete().filter_by(business_id_fk=restoID, list_id_fk=int(list_id))
+        d = listscontents.delete().filter_by(
+            business_id_fk=restoID, list_id_fk=int(list_id)
+        )
         db.session.execute(d)
         db.session.commit()
         print("REMOVE restoID from DATABASE")  # DB CODE INSERT HERE
