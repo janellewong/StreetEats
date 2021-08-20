@@ -59,8 +59,6 @@ We're making use of 4 databases here: users, lists, businesses and listcontents
 - The table listcontents which stores the data of each user's personalised lists has the primary key list_id_fk and foreign key businesses_id_fk.
 - Tables users and lists have one to many relationships with lists, businesses and listcontents respectively.
 
-<img width="369" alt="DB Schema" src="https://user-images.githubusercontent.com/69429491/130236067-d19766b8-4670-429f-8449-c1caa5e773ee.png">
-
 ---
 ### Monitoring
 This project is being monitored through a combination of the tools
