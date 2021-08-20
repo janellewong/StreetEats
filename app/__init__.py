@@ -440,6 +440,34 @@ def check():
     return "Working"
 
 
+@app.route("/removeList", method=["POST"])
+def removeList():
+    removeName = request.form.get("removelist")
+    listNames = getListNames(current_user.user_id)
+    listIds = getListIds(current_user.user_id)
+
+    for entry in listNames:
+        if entry == removeName:
+            index = listNames.index(entry)
+            list_id_remove = listIds[index]  # LIST ID TO REMOVE
+
+    return '{"id":"%s","success":true}' % list_id_remove
+
+
+""" @app.route("/removeResto", method=["POST"])
+def removeList():
+    removeName = request.form.get("removeResto")
+    listNames = getListNames(current_user.user_id)
+    listIds = getListIds(current_user.user_id)
+
+    for entry in listNames:
+        if entry == removeName:
+            index = listNames.index(entry)
+            resto_id_remove = listIds[index]  # LIST ID TO REMOVE
+
+    return "hello" """
+
+
 @app.route("/userhomepage", methods=["POST"])
 def userhomepage():
 
