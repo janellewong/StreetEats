@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta property="og:title" content="StreetEats>
+  <meta property="og:title" content="StreetEats">
   <meta property=" og:description" content="StreetEats">
   <meta property="og:url" content="{{ url }}">
 
@@ -52,31 +52,38 @@
 
   <div class="login">
     <div class="card">
-        <div class="reg-paddingl">
-            <div class="card-body" style="color: black;">
-              <h5 class="login-words" style="font-size: 30px">Login</h5>
-              <br>
+      <div class="reg-paddingl">
+        <div class="card-body" style="color: black;">
+          <h5 class="login-words" style="font-size: 30px">Login</h5>
+          <br>
 
-                <form action="/login" method="POST">
-                    <div class="msg"> </div>
-                    <div class="form-floating mb-3">
-                        <input id ="username" name ="username" type="text" class="form-control" id="floatingInput" placeholder="Username">
-                        <label for="floatingInput">Username</label>
-                    </div>
+          <form action="/login" method="POST">
+            <div class="msg"> </div>
+            <div class="form-floating mb-3">
+              <input id="username" name="username" type="text" class="form-control" id="floatingInput"
+                placeholder="Username">
+              <label for="floatingInput">Username</label>
+            </div>
 
-                    <div class="form-floating">
-                        <input id ="password" name ="password" type="password" class="form-control" id="floatingPassword" placeholder="Password">
-                        <label for="floatingPassword">Password</label>
-                    </div>
-                    <br>
-                    <p class="bottom": style="color:black; font-size: 14px;">Don't have an account?  <a class="bottom" : style="color:#42a7f5" href="/register"> Register Here!</a></p>
-                    <br>
-                    <div class=button-padding>
-                        <div class="col-12">
-                            <button class="btn btn-primary" type="submit">Login</button>
-                        </div>
-                    </div>
-                </form>
+            <div class="form-floating">
+              <input id="password" name="password" type="password" class="form-control" id="floatingPassword"
+                placeholder="Password">
+              <label for="floatingPassword">Password</label>
+            </div>
+            <br>
+            {% if message %}
+            <p>{{ message }}</p>
+            {% endif %}
+            <br>
+            <p class="bottom" : style="color:black; font-size: 14px;">Don't have an account? <a class="bottom" :
+                style="color:#42a7f5" href="/register"> Register Here!</a></p>
+            <br>
+            <div class=button-padding>
+              <div class="col-12">
+                <button class="btn btn-primary" type="submit">Login</button>
+              </div>
+            </div>
+          </form>
 
         </div>
       </div>
