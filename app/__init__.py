@@ -550,8 +550,12 @@ def userpage():
 def createNewList():
     if current_user.is_active:
         newList_name = request.form.get("newList")
-        ## need to make dynamic for user
-        createList(current_user.user_id, newList_name)
+        
+        ## if the new list name != a list they current have, then create the new list
+        if newList_name not in getListNames(current_user.user_id):
+            createList(current_user.user_id, newList_name)
+        else:
+            print(f"{newList_name} already exists", flush=True)
 
         return '{"id":"%s","success":true}' % newList_name
     else:
