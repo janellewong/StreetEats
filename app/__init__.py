@@ -73,22 +73,6 @@ app.config["SESSION_PERMANENT"] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-friends = db.Table(
-    "friends",
-    db.Column(
-        "user_id_fk",
-        db.Integer,
-        db.ForeignKey("users.user_id", ondelete="CASCADE"),
-        primary_key=True,
-    ),
-    db.Column(
-        "friend_id",
-        db.Integer,
-        db.ForeignKey("users.user_id", ondelete="CASCADE"),
-        primary_key=True,
-    ),
-)
-
 # create user table
 class UserModel(db.Model):
     __tablename__ = "users"
@@ -98,13 +82,6 @@ class UserModel(db.Model):
     password = db.Column(db.String())
     lists = db.relationship("Lists", backref="List_OwnerID")
     # User has lists that refers to Lists db
-    friendship = db.relationship(
-        "UserModel",
-        secondary=friends,
-        primaryjoin=user_id == friends.c.user_id_fk,
-        secondaryjoin=user_id == friends.c.friend_id,
-        backref="followed_by",
-    )
 
     def __init__(self, username, password):
         # self.user_id = user_id
@@ -245,16 +222,6 @@ def getBusinessId(list_id):
         idList.append(id.business_id_fk)
 
     return idList
-
-
-## return friends ids
-def getFriends(userId):
-    # from .db import friends, db
-
-    # get names from friends table from user_id_fk
-    userIds = db.session.query(friends).filter_by(user_id_fk=1).all()
-    for userId in userIds:
-        print(userId.friend_id, flush=True)
 
 
 # creates a default liked list for every registered user
