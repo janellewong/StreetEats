@@ -55,7 +55,7 @@ Users are able to create new lists of restaurants to connect to their user profi
 
 #### APIs:
 - YelpFusion API
--  IP address API
+- IP address API
 - IP to coordinates API
 
 ---
@@ -72,6 +72,8 @@ We're making use of 4 databases here: users, lists, businesses and listcontents
 - StreetEats
 - PostgreSql 
 - Nginx-Certbot
+- Grafana
+- Prometheus
 
 ---
 ### Monitoring
