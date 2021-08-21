@@ -1,4 +1,4 @@
-{% extends "userview.html" %}
+{% extends "restoView.html" %}
 
 {% block content %}
 
@@ -15,7 +15,9 @@
             <p><strong>Rating: </strong> {{businessData['rating']}}</p>
             <p><strong>Phone: </strong>{{businessData['display_phone']}}</p>
             <p><strong>Services: </strong> {{businessData['transactions']}}</p>
-            <p><strong>Address: </strong>{{businessData['location']['address1']}}, {{businessData['location']['city']}}, {{businessData['location']['state']}} {{businessData['location']['zip_code']}}, {{businessData['location']['country']}}</p>
+            <p><strong>Address: </strong>{{businessData['location']['address1']}}, {{businessData['location']['city']}},
+                {{businessData['location']['state']}} {{businessData['location']['zip_code']}},
+                {{businessData['location']['country']}}</p>
 
             <br>
             <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
