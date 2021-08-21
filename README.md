@@ -7,13 +7,17 @@ StreetEats is a website that allows users to access local restaurants based on t
 Website Link:(https://street-eats.tech/)
 
 The home page consists of a search bar where you enter the type of food and the location. If no location is entered then the user's location is utilized. The navigation bar has links to the Login and Register page.
+
 <img width="1000" alt="Screen Shot 2021-08-20 at 12 57 55 PM" src="https://user-images.githubusercontent.com/38405709/130287628-78beb3e5-c926-4b28-af14-d35b6847e0fe.png">
 
 Once the search command has been processed restaurants at that location that provide the cuisine are displayed.
+
 <img width="1429" alt="Screen Shot 2021-08-20 at 12 58 31 PM" src="https://user-images.githubusercontent.com/38405709/130298868-65c92fb8-0f16-4063-9816-c6e03b6c02ae.png">
 
 Your favourite restaurants can be added to a personal list and saved.
+
 <img width="1436" alt="Screen Shot 2021-08-20 at 1 00 10 PM" src="https://user-images.githubusercontent.com/38405709/130299551-a343d4f2-31ae-465a-8d81-5b554273e0ca.png">
+
 <img width="1437" alt="Screen Shot 2021-08-20 at 1 00 47 PM" src="https://user-images.githubusercontent.com/38405709/130299569-5383372f-8caa-4060-96a0-ee079eb068ba.png">
 
 You can search for locations without logging in *however*, you cannot make your personalised lists.
@@ -21,6 +25,7 @@ You can search for locations without logging in *however*, you cannot make your 
 ---
 
 ### Getting Started
+
 This example uses features in Docker 3.3. 2. Install this version to run.
 
 To run the website as an application use:
