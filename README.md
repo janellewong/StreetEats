@@ -1,8 +1,8 @@
 # StreetEats
 
 
-
 ### Overview
+
 StreetEats is a website that allows users to access local restaurants based on their location. Users can register, login, and customize lists of restaurants. Lists of restaurants are unique to each user to customize a title for their list and add/remove restaurants in each of their lists. 
 Website Link:(https://street-eats.tech/)
 
@@ -20,7 +20,6 @@ You can search for locations without logging in *however*, you cannot make your 
 
 ---
 
-
 ### Getting Started
 This example uses features in Docker 3.3. 2. Install this version to run.
 
@@ -30,6 +29,7 @@ To run the website as an application use:
 ---
 
 ### Main Features and Implementation
+
 #### Registration and Login
 Registration and login information is stored in a postgreSQL database to allow each user to have unique lists and account information. 
 
@@ -38,6 +38,7 @@ Users are able to create new lists of restaurants to connect to their user profi
 
 ---
 ### Technologies Featured
+
 - NginX as a reverse proxy
 - Docker as a containerising service
 - HTML and CSS for design of pages
@@ -51,6 +52,7 @@ Users are able to create new lists of restaurants to connect to their user profi
 - YelpFusion API
 -  IP address API
 - IP to coordinates API
+
 ---
 ### Database Schema
 
@@ -60,7 +62,15 @@ We're making use of 4 databases here: users, lists, businesses and listcontents
 - Tables users and lists have one to many relationships with lists, businesses and listcontents respectively.
 
 ---
+### Docker  Containers in the Instance
+
+- StreetEats
+- PostgreSql 
+- Nginx-Certbot
+
+---
 ### Monitoring
+
 This project is being monitored through a combination of the tools
 
 - cAdvisor (Port 8080)
@@ -69,27 +79,29 @@ This project is being monitored through a combination of the tools
 
 ---
 ### CI/CD
+
 Both CI and CD workflows are automated.
 
 ---
 ### Testing
+
 A linter check over the code occurs when someone makes a pull request to ensure optimal execution at all points.
 
 ---
 ### Challenges and Solutions
+
 Understanding how to connect our 3 APIs and our multiple databases was a challenge. We decided to divide API and database related tasks to assign to each team member. We had to stay organized and in communication to piece together our 3 APIs and our databases. We researched postgreSQL and API get/post requests in our assigned sections, and asked for help as needed.
 
 ---
-
-
 ### Contributors
+
 - Ayesha (https://github.com/ayesha133)
 - Janelle (https://github.com/janellewong)
 - Joey (https://github.com/aHappyCamer)
 - Nandhini (https://github.com/nandhiniswaminathan)
 - Rinki (https://github.com/mamnuya)
+
 ---
-
-
 ### License
+
 [MIT License](https://github.com/janellewong/StreetEats/blob/main/LICENSE)
