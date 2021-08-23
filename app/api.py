@@ -7,7 +7,7 @@ from flask import request
 
 def api_location(ip):
 
-    # # API  # 1
+    # # # API  # 1
     # ENDPOINT_IP = "https://api.ipify.org?format=json"  # method: GET
     # response_ip = requests.get(url=ENDPOINT_IP)
     # ip = response_ip.json()["ip"]

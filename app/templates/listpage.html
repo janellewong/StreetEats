@@ -12,7 +12,9 @@
   <div class="card mb-3" style="max-width: 1050px;" style="max-height: 50%;">
     <div class="row g-0">
       <div class="col-md-4">
-        <img src="{{entry['picture']}}" class="img-fluid rounded-start" alt="...">
+        <div class="photo-listpage">
+          <img src="{{entry['picture']}}" class="img-fluid rounded-start" alt="...">
+        </div>
       </div>
       <div class="col-md-8">
         <div class="card-body">
@@ -36,33 +38,27 @@
             </div>
           </form>
 
-
-          <div class="card-footer">
-            <!-- <small class="text-muted">Distance from you: {{entry['distance']}} m</small> -->
-          </div>
+          <!-- <div class="card-footer">
+            <small class="text-muted">Distance from you: {{entry['distance']}} m</small>
+          </div> -->
         </div>
       </div>
     </div>
-
-    <br>
-
-    <!-- delete list button here -->
-    <form action='/listpage' method="POST" class="removeList">
-      <div style="text-align:right">
-        <input type="hidden" name="removelist" value="{{name}}" />
-        <button class="btn btn-primary" type="submit" name="removeL" id="removeL" value="like">Delete list</button>
-      </div>
-    </form>
-
-
-
-
-    {% endfor %}
-
-
-
-
   </div>
+
+  <br>
+
+  {% endfor %}
+
+  <br>
+
+  <!-- delete list button here -->
+  <form action='/removeList' method="POST" class="removeList">
+    <div style="text-align:right">
+      <input type="hidden" name="removelist" value="{{name}}" />
+      <button class="btn btn-primary" type="submit" name="removeL" id="removeL" value="like">Delete list</button>
+    </div>
+  </form>
 
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -70,7 +66,7 @@
 
 $(document).ready(function() {
 $('.removeList').submit(function (e) {
-  e.preventDefault();
+  // e.preventDefault();
  
   $.ajax({
       url:"/removeList",
@@ -79,7 +75,7 @@ $('.removeList').submit(function (e) {
       data:$(e.target).serialize(),
       success: function (data) {
           console.log(data);
-          window.location.reload();
+          // window.location.reload();
       }
       });
 });
