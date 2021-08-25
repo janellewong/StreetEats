@@ -1,11 +1,11 @@
-{% extends "userview.html" %}
+{% extends "restoView.html" %}
 
 {% block content %}
 
 <div class="content">
     <div class="card mb-3">
         <div class="photo-results">
-            <img src="{{businessData['image_url']}}" class="card-img-top" alt="...">
+            <img src="{{businessData['image_url']}}" class="card-img-top" alt="..." style="height:30%">
         </div>
         <div class="card-body">
             <h2 class="card-title">{{name}}</h2>
@@ -15,7 +15,9 @@
             <p><strong>Rating: </strong> {{businessData['rating']}}</p>
             <p><strong>Phone: </strong>{{businessData['display_phone']}}</p>
             <p><strong>Services: </strong> {{businessData['transactions']}}</p>
-            <p><strong>Address: </strong>{{businessData['location']['address1']}}, {{businessData['location']['city']}}, {{businessData['location']['state']}} {{businessData['location']['zip_code']}}, {{businessData['location']['country']}}</p>
+            <p><strong>Address: </strong>{{businessData['location']['address1']}}, {{businessData['location']['city']}},
+                {{businessData['location']['state']}} {{businessData['location']['zip_code']}},
+                {{businessData['location']['country']}}</p>
 
             <br>
             <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
@@ -34,7 +36,7 @@
             <div class="review-content">
                 <div class="card mb-3">
                     <div class="card-body">
-                        <h4 class="card-title">Review #1</h4>
+                        <h4 class="card-title">Review</h4>
                         <p class="card-text">
                             Rating: {{data['rating']}}
                             <br>{{data['text']}} <br><br>
