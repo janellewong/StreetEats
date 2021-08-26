@@ -4,7 +4,9 @@
 ### Overview
 
 StreetEats is a website that allows users to access local restaurants based on their location. Users can register, login, and customize lists of restaurants. Lists of restaurants are unique to each user to customize a title for their list and add/remove restaurants in each of their lists. 
-Website Link:(https://street-eats.tech/)
+Website Link: https://street-eats.tech/
+
+Watch our video demo of this website here: https://devpost.com/software/streeteats
 
 The home page consists of a search bar where you enter the type of food and the location. If no location is entered then the user's location is utilized. The navigation bar has links to the Login and Register page.
 
